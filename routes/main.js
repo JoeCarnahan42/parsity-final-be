@@ -1,9 +1,10 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 // TODO - make a .env and link it here
 // TODO - add db logic
 
-const JWT_KEY = process.env.SECRET_KEY || "84345512";
+const JWT_KEY = process.env.SECRET_KEY;
 
 const authenticate = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
