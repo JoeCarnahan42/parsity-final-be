@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 // TODO - make a .env and link it here
 // TODO - add db logic
+const pool = require("../dataBase/db");
 
 const JWT_KEY = process.env.SECRET_KEY;
 
