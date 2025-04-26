@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const pool = require("../dataBase/db");
 
+// TODO - Delete this : Testing only
 router.post("/create-user", async (req, res) => {
   const { email, password } = req.body;
 
@@ -38,8 +39,15 @@ const authenticate = (req, res, next) => {
   }
 };
 
-router.get("/projects", authenticate, (req, res) => {
-  res.json({ message: "Working!" });
+router.get("/projects", authenticate, async (req, res) => {
+  try {
+    const projects = await pool.query("SELECT * FROM projects");
+    res.status(200).json(projects.rows);
+  } catch (err) {
+    console.error;
+    err.message;
+    res.status(400).json({ error: "Database Error" });
+  }
 });
 
 router.post("/projects", authenticate, (req, res) => {
@@ -48,25 +56,33 @@ router.post("/projects", authenticate, (req, res) => {
   res.status(201).json({ message: "Project created", data: newProject });
 });
 
-router.post("/login", (req, res) => {
+// TODO - review password encryption
+router.post("/login", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
   if (email && password) {
-    // TODO - search DB for a valid user
-    const user = "user validation logic here";
-    if (user) {
-      const newAccessToken = jwt.sign(
-        {
-          username: user.login.username,
-        },
-        JWT_KEY,
-        { expiresIn: "30m" }
+    try {
+      const users = await pool.query("SELECT * FROM users");
+      const userList = users.rows;
+      const validUser = userList.filter(
+        (user) => user.email === email && user.password === password
       );
+      if (validUser) {
+        const newAccessToken = jwt.sign(
+          {
+            username: validUser.email,
+          },
+          JWT_KEY,
+          { expiresIn: "30m" }
+        );
 
-      // check for valid token, assign new one if not valid
-    } else {
-      res.status(400).json({ message: "Invalid Username or Password" });
+        res.status(200).json({ token: newAccessToken });
+      } else {
+        res.status(400).json({ message: "Invalid Username or Password" });
+      }
+    } catch (err) {
+      res.status(400).json({ message: "Invalid Email or Password" });
     }
   }
 
