@@ -2,7 +2,6 @@ const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-// Connect DB
 const pool = require("../dataBase/db");
 
 router.post("/create-user", async (req, res) => {
@@ -54,7 +53,8 @@ router.post("/login", (req, res) => {
   const password = req.body.password;
 
   if (email && password) {
-    // check for valid user
+    // TODO - search DB for a valid user
+    const user = "user validation logic here";
     if (user) {
       const newAccessToken = jwt.sign(
         {

@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const pool = require("./dataBase/db");
 
 const app = express();
 
@@ -26,4 +27,17 @@ app.use(mainRoutes);
 
 app.listen(8000, () => {
   console.log("Node.js listening on port " + 8000);
+});
+
+pool.connect().then((client) => {
+  return client
+    .query("SELECT NOW()")
+    .then((res) => {
+      console.log("DB connected! Time:", res.rows[0].now);
+      client.release();
+    })
+    .catch((err) => {
+      client.release();
+      console.error("DB connection error:", err.stack);
+    });
 });
