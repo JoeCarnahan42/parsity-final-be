@@ -50,6 +50,19 @@ router.get("/projects", authenticate, async (req, res) => {
   }
 });
 
+router.get("/projects/:id", authenticate, async (req, res) => {
+  const project = req.params.id;
+  try {
+    const viewedProj = await pool.query(
+      "SELECT * FROM projects WHERE id = $1",
+      [project]
+    );
+    res.status(200).json(viewedProj.rows[0]);
+  } catch (err) {
+    res.status(400).json({ message: "No Project Found" });
+  }
+});
+
 router.post("/projects", authenticate, async (req, res) => {
   const { title, customer, state } = req.body;
   try {
