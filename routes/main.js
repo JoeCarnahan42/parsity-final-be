@@ -260,4 +260,7 @@ router.get("/projects/:id/current-metrics", authenticate, async (req, res) => {
   }
 });
 
+// TODO - Add routes
+// DELETE, PUT - updating existing data
+
 module.exports = router;
