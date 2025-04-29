@@ -50,8 +50,17 @@ router.get("/projects", authenticate, async (req, res) => {
   }
 });
 
-router.post("/projects", authenticate, (req, res) => {
-  const newProject = req.body;
+router.post("/projects", authenticate, async (req, res) => {
+  const { title, customer, state } = req.body;
+  try {
+    const newProject = await pool.query(
+      "INSERT INTO projects (title, customer, state) VALUES ($1, $2, $3) RETURNING *",
+      [title, customer, state]
+    );
+    res.status(200).json(newProject.rows[0]);
+  } catch (err) {
+    res.status(400).json({ message: err });
+  }
 
   res.status(201).json({ message: "Project created", data: newProject });
 });
