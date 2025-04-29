@@ -78,6 +78,28 @@ router.post("/projects", authenticate, async (req, res) => {
   res.status(201).json({ message: "Project created", data: newProject });
 });
 
+// adds a new task to a defined project
+router.post("/projects/:id/in-house", authenticate, async (req, res) => {
+  const { title, partNumber, material, hours } = req.body;
+  const projectId = req.params.id;
+  const status = "pending";
+
+  if (!title || !partNumber || !material || !hours) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    const newTask = await pool.query(
+      "INSERT INTO in_house_tasks (project_id, title, partnumber, material, hours, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [projectId, title, partNumber, material, hours, status]
+    );
+    res.status(200).json(newTask.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to add task to project" });
+  }
+});
+
 // TODO - review password encryption
 router.post("/login", async (req, res) => {
   const email = req.body.email;
