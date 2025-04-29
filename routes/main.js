@@ -78,7 +78,7 @@ router.post("/projects", authenticate, async (req, res) => {
   res.status(201).json({ message: "Project created", data: newProject });
 });
 
-// adds a new task to a defined project
+// adds a new in house task to a defined project
 router.post("/projects/:id/in-house", authenticate, async (req, res) => {
   const { title, partNumber, material, hours } = req.body;
   const projectId = req.params.id;
@@ -135,6 +135,129 @@ router.post("/login", async (req, res) => {
   }
 
   res.json({ email: email, password: password });
+});
+
+// TODO - TEST THESE ROUTES ALL ARE UNTESTED
+router.get("/projects/:id/in-house", authenticate, async (req, res) => {
+  // GET in house tasks of a defined project
+  const projectId = req.params.id;
+
+  try {
+    const getTasks = await pool.query(
+      "SELECT * FROM in_house_tasks WHERE project_id = ($1)",
+      [projectId]
+    );
+    res.status(200).json(getTasks.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Database Error" });
+  }
+});
+
+router.post("/projects/:id/purchase-list", authenticate, async (req, res) => {
+  // POST items to purchse list
+  const projectId = req.params.id;
+  const { title, partNumber, description, orderedOn } = req.body;
+
+  if (!title || !partNumber || !description || !orderedOn) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    const addPurchasae = await pool.query(
+      "INSERT INTO purchase_list (project_id, title, partnumber, description, ordered_on) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [projectId, title, partNumber, description, orderedOn]
+    );
+    res.status(200).json(addPurchasae.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
+});
+
+router.get("/projects/:id/purchase-list", authenticate, async (req, res) => {
+  // GET purchase list table
+  const projectId = req.params.id;
+  try {
+    const getPurchases = await pool.query(
+      "SELECT * FROM purchase_list WHERE project_id = ($1)",
+      [projectId]
+    );
+    res.status(200).json(getPurchases.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
+});
+
+router.post(
+  "/projects/:id/projected-metrics",
+  authenticate,
+  async (req, res) => {
+    // POST initial projected metrics.
+    const projectId = req.params.id;
+    const { budgetMoney, budgetHours, dueDate } = req.body;
+    try {
+      const addMetrics = await pool.query(
+        "INSERT INTO projected_metrics (project_id, budget_money, budget_hours, due_date) VALUES ($1, $2, $3, $4) RETURNING *",
+        [projectId, budgetMoney, budgetHours, dueDate]
+      );
+      res.status(200).json(addMetrics.rows[0]);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Database Error" });
+    }
+  }
+);
+
+router.get(
+  "/projects/:id/projected-metrics",
+  authenticate,
+  async (req, res) => {
+    // GET all projected metrics
+    const projectId = req.params.id;
+    try {
+      const projectedMetrics = await pool.query(
+        "SELECT * FROM projected_metrics WHERE project_id = ($1)",
+        [projectId]
+      );
+      res.status(200).json(projectedMetrics.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Database Error" });
+    }
+  }
+);
+
+router.post("/projects/:id/current-metrics", authenticate, async (req, res) => {
+  // POST used to update current metrics with current data
+  const projectId = req.params.id;
+  const { budgetMoney, budgetHours, expectedDate } = req.body;
+  try {
+    const updateMetrics = await pool.query(
+      "INSERT INTO current_metrics (project_id, budget_money, budget_hours, expected_date) VALUES ($1, $2, $3, $4)",
+      [projectId, budgetMoney, budgetHours, expectedDate]
+    );
+    res.status(200).json(updateMetrics.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
+});
+
+router.get("/projects/:id/current-metrics", authenticate, async (req, res) => {
+  // GET all current metrics of specific project
+  const projectId = req.params.id;
+  try {
+    const currentMetrics = await pool.query(
+      "SELECT * FROM current_metrics WHERE project_id = ($1)",
+      [projectId]
+    );
+    res.status(200).json(currentMetrics.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
 });
 
 module.exports = router;
