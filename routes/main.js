@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const pool = require("../dataBase/db");
 
-// TODO - Delete this : Testing only
+// TODO - Better user registration
 router.post("/create-user", async (req, res) => {
   const { email, password } = req.body;
 
@@ -63,7 +63,6 @@ router.get("/projects/:id", authenticate, async (req, res) => {
   }
 });
 
-// TODO - re structure initial project POST
 router.post("/projects", authenticate, async (req, res) => {
   const client = await pool.connect();
 
@@ -167,7 +166,7 @@ router.post("/projects", authenticate, async (req, res) => {
     if (Array.isArray(purchaseList) && purchaseList.length > 0) {
       const values = [];
       const params = [];
-      // Specific logic here
+
       purchaseList.forEach((item, i) => {
         const idx = i * 6;
         values.push(
@@ -204,7 +203,6 @@ router.post("/projects", authenticate, async (req, res) => {
   }
 });
 
-// adds a new in house task to a defined project
 router.post("/projects/:id/in-house", authenticate, async (req, res) => {
   const { title, partNumber, material, hours } = req.body;
   const projectId = req.params.id;
@@ -244,7 +242,7 @@ router.post("/login", async (req, res) => {
             username: validUser.email,
           },
           JWT_KEY,
-          { expiresIn: "30m" }
+          { expiresIn: "60m" }
         );
 
         res.status(200).json({ token: newAccessToken });
@@ -263,9 +261,7 @@ router.post("/login", async (req, res) => {
   res.json({ email: email, password: password });
 });
 
-// TODO - TEST THESE ROUTES ALL ARE UNTESTED
 router.get("/projects/:id/in-house", authenticate, async (req, res) => {
-  // GET in house tasks of a defined project
   const projectId = req.params.id;
 
   try {
@@ -281,7 +277,7 @@ router.get("/projects/:id/in-house", authenticate, async (req, res) => {
 });
 
 router.post("/projects/:id/purchase-list", authenticate, async (req, res) => {
-  // POST items to purchse list
+  // TODO - Add price to this
   const projectId = req.params.id;
   const { title, partNumber, description, orderedOn } = req.body;
 
@@ -302,7 +298,7 @@ router.post("/projects/:id/purchase-list", authenticate, async (req, res) => {
 });
 
 router.get("/projects/:id/purchase-list", authenticate, async (req, res) => {
-  // GET purchase list table
+  // TODO - Add a check for :id and give proper response
   const projectId = req.params.id;
   try {
     const getPurchases = await pool.query(
@@ -320,7 +316,6 @@ router.post(
   "/projects/:id/projected-metrics",
   authenticate,
   async (req, res) => {
-    // POST initial projected metrics.
     const projectId = req.params.id;
     const { budgetMoney, budgetHours, dueDate } = req.body;
     try {
@@ -340,7 +335,6 @@ router.get(
   "/projects/:id/projected-metrics",
   authenticate,
   async (req, res) => {
-    // GET all projected metrics
     const projectId = req.params.id;
     try {
       const projectedMetrics = await pool.query(
@@ -355,13 +349,14 @@ router.get(
   }
 );
 
+// Initial upload of current metrics
 router.post("/projects/:id/current-metrics", authenticate, async (req, res) => {
-  // POST used to update current metrics with current data
+  // Works but does not return the object
   const projectId = req.params.id;
   const { budgetMoney, budgetHours, expectedDate } = req.body;
   try {
     const updateMetrics = await pool.query(
-      "INSERT INTO current_metrics (project_id, budget_money, budget_hours, expected_date) VALUES ($1, $2, $3, $4)",
+      "INSERT INTO current_metrics (project_id, budget_money, budget_hours, expected_date) VALUES ($1, $2, $3, $4) RETURNING *",
       [projectId, budgetMoney, budgetHours, expectedDate]
     );
     res.status(200).json(updateMetrics.rows[0]);
@@ -372,7 +367,6 @@ router.post("/projects/:id/current-metrics", authenticate, async (req, res) => {
 });
 
 router.get("/projects/:id/current-metrics", authenticate, async (req, res) => {
-  // GET all current metrics of specific project
   const projectId = req.params.id;
   try {
     const currentMetrics = await pool.query(
@@ -386,7 +380,137 @@ router.get("/projects/:id/current-metrics", authenticate, async (req, res) => {
   }
 });
 
-// TODO - Add routes
+// TODO - Add routes and test routes
 // DELETE, PUT - updating existing data
+
+router.delete("/projects/:id", async (req, res) => {
+  const projectId = req.params.id;
+
+  try {
+    const deletedProj = await pool.query(
+      "DELETE FROM projects WHERE project_id = $1 RETURNING *",
+      [projectId]
+    );
+    res.status(200).json(deletedProj.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Error deleting project" });
+  }
+});
+
+router.delete("/projects/:id/in-house", async (req, res) => {
+  const projectId = req.params.id;
+  const taskId = req.body;
+
+  try {
+    const deletedTask = await pool.query(
+      "DELETE FROM in_house_tasks WHERE project_id = $1 AND id = $2 RETURNING *",
+      [projectId, taskId]
+    );
+    res.status(200).json(deletedTask.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "error deleting task" });
+  }
+});
+
+router.delete("/projects/:id/purchase-list", async (req, res) => {
+  const projectId = req.params.id;
+  const purchaseId = req.body;
+
+  try {
+    const deletedPurchase = await pool.query(
+      "DELETE FROM purchase_list WHERE project_id = $1 AND id = $2 RETURNING *",
+      [projectId, purchaseId]
+    );
+    res.status(200).json(deletedPurchase.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "error deleting purchase item" });
+  }
+});
+
+router.delete("/projects/:id/project-managers", async (req, res) => {
+  const projectId = req.params.id;
+  const managerId = req.body;
+
+  try {
+    const deletedManager = await pool.query(
+      "DELETE FROM project_managers WHERE project_id = $1 AND id = $2 RETURNING *",
+      [projectId, managerId]
+    );
+    res.status(200).json(deletedManager.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "error deleting project manager" });
+  }
+});
+
+router.delete("/projects/:id/users", async (req, res) => {
+  const userId = req.body;
+
+  try {
+    const deletedUser = await pool.query(
+      "DELETE FROM users WHERE id = $1 RETURNING *",
+      [userId]
+    );
+    res.status(200).json(deletedUser.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "error deleting user" });
+  }
+});
+
+router.put("/products/:id/current-metrics", async (req, res) => {
+  const projectId = req.params.id;
+  const [budgetMoney, budgetHours, expectedDate] = req.body;
+
+  // TODO - add conditionals to separate individual changed. EX: if only expeted date changes, only that will be changed.
+
+  try {
+    const updateMetric = await pool.query(
+      "UPDATE current_metrics SET budget_money = $1, budget_hours = $2, expected_date = $3 WHERE project_id = $4 RETURNING *",
+      [budgetMoney, budgetHours, expectedDate, projectId]
+    );
+    res.status(200).json(updateMetric.rows(0));
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Error updating metrics" });
+  }
+});
+
+router.put("/projects/:id/in-house", async (req, res) => {
+  const projectId = req.params.id;
+  const [title, partNumber, material, hours, status] = req.body;
+
+  try {
+    const updatedTask = await pool.query(
+      "UPDATE in_house_tasks SET title = $1, part_number = $2, material = $3, hours = $4, status = $5 WHERE project_id = $6 RETURNING *",
+      [title, partNumber, material, hours, status, projectId]
+    );
+    res.status(200).json(updatedTask.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "error updating task" });
+  }
+});
+
+router.put("/projects/:id/purchase-list", async (req, res) => {
+  const projectId = req.params.id;
+  const [title, partNumber, description, orderedOn] = req.body;
+
+  try {
+    const updatedPurchase = await pool.query(
+      "UPDATE purchase_list SET title = $1, part_number = $2, description = $3, ordered_on = $4 WHERE project_id = $5 RETURNING *",
+      [title, partNumber, description, orderedOn, projectId]
+    );
+    res.status(200).json(updatedPurchase.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "error updating purchase" });
+  }
+});
+
+// TODO - potential put routes for changing all possible rows
 
 module.exports = router;
