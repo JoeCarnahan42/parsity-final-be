@@ -1,6 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const pool = require("./dataBase/db");
+const loginRoutes = require("./routes/login");
+const registerRoutes = require("./routes/register");
+const metricRoutes = require("./routes/metrics");
+const pmRoutes = require("./routes/pm");
+const projRoutes = require("./routes/proj");
+const purchaseRoutes = require("./routes/purchase");
+const taskRoutes = require("./routes/task");
 
 const app = express();
 
@@ -21,9 +28,13 @@ app.use((req, res, next) => {
   next();
 });
 
-const mainRoutes = require("./routes/main");
-// TODO - look in to route separation
-app.use(mainRoutes);
+app.use("/login", loginRoutes);
+app.use("/register", registerRoutes);
+app.use("/metrics", metricRoutes);
+app.use("/pm", pmRoutes);
+app.use("/projects", projRoutes);
+app.use("/purchases", purchaseRoutes);
+app.use("/tasks", taskRoutes);
 
 app.listen(8000, () => {
   console.log("Node.js listening on port " + 8000);
