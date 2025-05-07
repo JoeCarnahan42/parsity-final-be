@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 });
 
 const mainRoutes = require("./routes/main");
-
+// TODO - look in to route separation
 app.use(mainRoutes);
 
 app.listen(8000, () => {
