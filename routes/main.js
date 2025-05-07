@@ -51,11 +51,16 @@ router.get("/projects", authenticate, async (req, res) => {
 });
 
 router.get("/projects/:id", authenticate, async (req, res) => {
-  const project = req.params.id;
+  const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   try {
     const viewedProj = await pool.query(
       "SELECT * FROM projects WHERE id = $1",
-      [project]
+      [projectId]
     );
     res.status(200).json(viewedProj.rows[0]);
   } catch (err) {
@@ -208,6 +213,10 @@ router.post("/projects/:id/in-house", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const status = "pending";
 
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   if (!title || !partNumber || !material || !hours) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -264,6 +273,10 @@ router.post("/login", async (req, res) => {
 router.get("/projects/:id/in-house", authenticate, async (req, res) => {
   const projectId = req.params.id;
 
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   try {
     const getTasks = await pool.query(
       "SELECT * FROM in_house_tasks WHERE project_id = ($1)",
@@ -279,6 +292,11 @@ router.get("/projects/:id/in-house", authenticate, async (req, res) => {
 router.post("/projects/:id/purchase-list", authenticate, async (req, res) => {
   // TODO - Add price to this
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const { title, partNumber, description, orderedOn } = req.body;
 
   if (!title || !partNumber || !description || !orderedOn) {
@@ -298,8 +316,12 @@ router.post("/projects/:id/purchase-list", authenticate, async (req, res) => {
 });
 
 router.get("/projects/:id/purchase-list", authenticate, async (req, res) => {
-  // TODO - Add a check for :id and give proper response
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   try {
     const getPurchases = await pool.query(
       "SELECT * FROM purchase_list WHERE project_id = ($1)",
@@ -317,6 +339,11 @@ router.post(
   authenticate,
   async (req, res) => {
     const projectId = req.params.id;
+
+    if (!projectId) {
+      res.status(400).json({ message: "Cannot find query without an ID" });
+    }
+
     const { budgetMoney, budgetHours, dueDate } = req.body;
     try {
       const addMetrics = await pool.query(
@@ -336,6 +363,11 @@ router.get(
   authenticate,
   async (req, res) => {
     const projectId = req.params.id;
+
+    if (!projectId) {
+      res.status(400).json({ message: "Cannot find query without an ID" });
+    }
+
     try {
       const projectedMetrics = await pool.query(
         "SELECT * FROM projected_metrics WHERE project_id = ($1)",
@@ -353,6 +385,11 @@ router.get(
 router.post("/projects/:id/current-metrics", authenticate, async (req, res) => {
   // Works but does not return the object
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const { budgetMoney, budgetHours, expectedDate } = req.body;
   try {
     const updateMetrics = await pool.query(
@@ -368,6 +405,11 @@ router.post("/projects/:id/current-metrics", authenticate, async (req, res) => {
 
 router.get("/projects/:id/current-metrics", authenticate, async (req, res) => {
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   try {
     const currentMetrics = await pool.query(
       "SELECT * FROM current_metrics WHERE project_id = ($1)",
@@ -386,6 +428,10 @@ router.get("/projects/:id/current-metrics", authenticate, async (req, res) => {
 router.delete("/projects/:id", async (req, res) => {
   const projectId = req.params.id;
 
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   try {
     const deletedProj = await pool.query(
       "DELETE FROM projects WHERE project_id = $1 RETURNING *",
@@ -400,7 +446,16 @@ router.delete("/projects/:id", async (req, res) => {
 
 router.delete("/projects/:id/in-house", async (req, res) => {
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const taskId = req.body;
+
+  if (!taskId) {
+    res.status(400).json({ message: "Cannot find query without a Task ID" });
+  }
 
   try {
     const deletedTask = await pool.query(
@@ -416,7 +471,18 @@ router.delete("/projects/:id/in-house", async (req, res) => {
 
 router.delete("/projects/:id/purchase-list", async (req, res) => {
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const purchaseId = req.body;
+
+  if (!purchaseId) {
+    res
+      .status(400)
+      .json({ message: "Cannot find query without a Purchase ID" });
+  }
 
   try {
     const deletedPurchase = await pool.query(
@@ -432,7 +498,16 @@ router.delete("/projects/:id/purchase-list", async (req, res) => {
 
 router.delete("/projects/:id/project-managers", async (req, res) => {
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const managerId = req.body;
+
+  if (!managerId) {
+    res.status(400).json({ message: "Cannot find query without a Manager ID" });
+  }
 
   try {
     const deletedManager = await pool.query(
@@ -449,6 +524,10 @@ router.delete("/projects/:id/project-managers", async (req, res) => {
 router.delete("/projects/:id/users", async (req, res) => {
   const userId = req.body;
 
+  if (!userId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   try {
     const deletedUser = await pool.query(
       "DELETE FROM users WHERE id = $1 RETURNING *",
@@ -463,6 +542,11 @@ router.delete("/projects/:id/users", async (req, res) => {
 
 router.put("/products/:id/current-metrics", async (req, res) => {
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const [budgetMoney, budgetHours, expectedDate] = req.body;
 
   // TODO - add conditionals to separate individual changed. EX: if only expeted date changes, only that will be changed.
@@ -481,6 +565,11 @@ router.put("/products/:id/current-metrics", async (req, res) => {
 
 router.put("/projects/:id/in-house", async (req, res) => {
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const [title, partNumber, material, hours, status] = req.body;
 
   try {
@@ -497,6 +586,11 @@ router.put("/projects/:id/in-house", async (req, res) => {
 
 router.put("/projects/:id/purchase-list", async (req, res) => {
   const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
   const [title, partNumber, description, orderedOn] = req.body;
 
   try {
