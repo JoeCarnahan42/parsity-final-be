@@ -1,22 +1,34 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
 const JWT_KEY = process.env.SECRET_KEY;
 const pool = require("../dataBase/db");
 
 // TODO - Better user registration/ implement token
-router.post("/create-user", async (req, res) => {
+router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(400).json({ message: "Both fields must be entered" });
+    return res.status(400).json({ message: "Both fields must be entered" });
   }
 
   try {
+    // Encryption
+    const saltRounds = 10;
+    const encryptedPass = await bcrypt.hash(password, saltRounds);
+    // Generate token
+    const token = jwt.sign(
+      {
+        username: validUser.email,
+      },
+      JWT_KEY,
+      { expiresIn: "60m" }
+    );
+
     const newUser = await pool.query(
-      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
-      [email, password]
+      "INSERT INTO users (email, password, token) VALUES ($1, $2, $3) RETURNING *",
+      [email, encryptedPass, token]
     );
     res.status(200).json(newUser.rows[0]);
   } catch (err) {
