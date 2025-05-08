@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ message: "Invalid Username or Password" });
     }
 
-    const newAccessToken = jwt.sign(
+    const token = jwt.sign(
       {
         username: validUser.email,
       },
@@ -53,7 +53,14 @@ router.post("/", async (req, res) => {
       { expiresIn: "60m" }
     );
 
-    return res.status(200).json({ token: newAccessToken });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 3600000, // 1 hour
+    });
+
+    return res.status(200).json({ message: "Login Successful" });
   } catch (err) {
     return res.status(500).json({ message: "Server Error" });
   }
