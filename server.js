@@ -9,10 +9,10 @@ const projRoutes = require("./routes/proj");
 const purchaseRoutes = require("./routes/purchase");
 const taskRoutes = require("./routes/task");
 const cookieParser = require("cookie-parser");
-app.use(cookieParser());
 
 const app = express();
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
