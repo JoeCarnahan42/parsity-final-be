@@ -9,15 +9,18 @@ const pool = require("../dataBase/db");
 router.post("/create-user", async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    res.status(400).json({ message: "Both fields must be entered" });
+  }
+
   try {
     const newUser = await pool.query(
       "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
       [email, password]
     );
-    res.json(newUser.rows[0]);
+    res.status(200).json(newUser.rows[0]);
   } catch (err) {
-    console.error;
-    err.message;
+    console.error(err);
     res.status(500).json({ error: "Server Error" });
   }
 });
