@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const pool = require("../dataBase/db");
@@ -22,41 +23,40 @@ const authenticate = (req, res, next) => {
   }
 };
 
-// TODO - review password encryption
 router.post("/", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  if (email && password) {
-    try {
-      const users = await pool.query("SELECT * FROM users");
-      const userList = users.rows;
-      const validUser = userList.filter(
-        (user) => user.email === email && user.password === password
-      );
-      if (validUser) {
-        const newAccessToken = jwt.sign(
-          {
-            username: validUser.email,
-          },
-          JWT_KEY,
-          { expiresIn: "60m" }
-        );
-
-        res.status(200).json({ token: newAccessToken });
-      } else {
-        res.status(400).json({ message: "Invalid Username or Password" });
-      }
-    } catch (err) {
-      res.status(400).json({ message: "Invalid Email or Password" });
-    }
-  }
-
+  // TODO - Add token to cookies, THEN update authenticate code to check the cookies for the token.
   if (!email || !password) {
-    res.status(400).json({ message: "Incorrectly Formatted Request" });
+    return res.status(400).json({ message: "Incorrectly Formatted Request" });
   }
 
-  res.json({ email: email, password: password });
+  try {
+    const user = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+    const validUser = user.rows[0];
+    if (!validUser) {
+      return res.status(401).json({ message: "Invalid Username or Password" });
+    }
+    const verifyPass = await bcrypt.compare(password, validUser.password);
+    if (!verifyPass) {
+      return res.status(401).json({ message: "Invalid Username or Password" });
+    }
+
+    const newAccessToken = jwt.sign(
+      {
+        username: validUser.email,
+      },
+      JWT_KEY,
+      { expiresIn: "60m" }
+    );
+
+    return res.status(200).json({ token: newAccessToken });
+  } catch (err) {
+    return res.status(500).json({ message: "Server Error" });
+  }
 });
 
 router.delete("/:id/users", authenticate, async (req, res) => {

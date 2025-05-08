@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const JWT_KEY = process.env.SECRET_KEY;
 const pool = require("../dataBase/db");
 
 // TODO - Better user registration/ implement token
@@ -17,18 +15,10 @@ router.post("/", async (req, res) => {
     // Encryption
     const saltRounds = 10;
     const encryptedPass = await bcrypt.hash(password, saltRounds);
-    // Generate token
-    const token = jwt.sign(
-      {
-        username: validUser.email,
-      },
-      JWT_KEY,
-      { expiresIn: "60m" }
-    );
 
     const newUser = await pool.query(
-      "INSERT INTO users (email, password, token) VALUES ($1, $2, $3) RETURNING *",
-      [email, encryptedPass, token]
+      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
+      [email, encryptedPass]
     );
     res.status(200).json(newUser.rows[0]);
   } catch (err) {
