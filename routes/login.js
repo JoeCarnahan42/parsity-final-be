@@ -37,11 +37,11 @@ router.post("/", async (req, res) => {
     ]);
     const validUser = user.rows[0];
     if (!validUser) {
-      return res.status(401).json({ message: "Invalid Username or Password" });
+      return res.status(401).json({ message: "Invalid Email or Password" });
     }
     const verifyPass = await bcrypt.compare(password, validUser.password);
     if (!verifyPass) {
-      return res.status(401).json({ message: "Invalid Username or Password" });
+      return res.status(401).json({ message: "Invalid Email or Password" });
     }
 
     const token = jwt.sign(
@@ -66,7 +66,7 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id/users", authenticate, async (req, res) => {
-  const userId = req.body;
+  const userId = req.params.id;
 
   if (!userId) {
     res.status(400).json({ message: "Cannot find query without an ID" });
@@ -80,7 +80,7 @@ router.delete("/:id/users", authenticate, async (req, res) => {
     res.status(200).json(deletedUser.rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "error deleting user" });
+    res.status(500).json({ message: "error deleting user" });
   }
 });
 
