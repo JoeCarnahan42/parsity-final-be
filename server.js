@@ -9,9 +9,14 @@ const projRoutes = require("./routes/proj");
 const purchaseRoutes = require("./routes/purchase");
 const taskRoutes = require("./routes/task");
 const cookieParser = require("cookie-parser");
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+
+const swaggerDoc = YAML.load("./swagger.yaml");
 
 const app = express();
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(
