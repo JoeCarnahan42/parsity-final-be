@@ -27,7 +27,6 @@ router.post("/", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  // TODO - Add token to cookies, THEN update authenticate code to check the cookies for the token.
   if (!email || !password) {
     return res.status(400).json({ message: "Incorrectly Formatted Request" });
   }

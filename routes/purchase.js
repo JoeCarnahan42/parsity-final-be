@@ -22,23 +22,22 @@ const authenticate = (req, res, next) => {
 };
 
 router.post("/:id/purchase-list", authenticate, async (req, res) => {
-  // TODO - Add price to this
   const projectId = req.params.id;
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });
   }
 
-  const { title, partNumber, description, orderedOn } = req.body;
+  const { title, partNumber, description, orderedOn, price } = req.body;
 
-  if (!title || !partNumber || !description || !orderedOn) {
+  if (!title || !partNumber || !description || !orderedOn || !price) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
     const addPurchasae = await pool.query(
-      "INSERT INTO purchase_list (project_id, title, partnumber, description, ordered_on) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [projectId, title, partNumber, description, orderedOn]
+      "INSERT INTO purchase_list (project_id, title, partnumber, description, ordered_on, price) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [projectId, title, partNumber, description, orderedOn, price]
     );
     res.status(200).json(addPurchasae.rows[0]);
   } catch (err) {
