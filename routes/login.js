@@ -8,7 +8,7 @@ const pool = require("../dataBase/db");
 const JWT_KEY = process.env.SECRET_KEY;
 
 const authenticate = (req, res, next) => {
-  const token = req.header("Authorization")?.split(" ")[1];
+  const token = req.cookies.token;
 
   if (!token) {
     res.status(401).json({ error: "No token provided" });
