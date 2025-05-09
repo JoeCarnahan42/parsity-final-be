@@ -100,23 +100,36 @@ router.get("/:id/current-metrics", authenticate, async (req, res) => {
   }
 });
 
+// Dynamic updating of current metrics
 router.put("/:id/current-metrics", authenticate, async (req, res) => {
   const projectId = req.params.id;
+  const updates = req.body;
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });
   }
 
-  const [budgetMoney, budgetHours, expectedDate] = req.body;
-
-  // TODO - add conditionals to separate individual changes. EX: if only expeted date changes, only that will be changed.
-
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: "No updates provided" });
+  }
   try {
-    const updateMetric = await pool.query(
-      "UPDATE current_metrics SET budget_money = $1, budget_hours = $2, expected_date = $3 WHERE project_id = $4 RETURNING *",
-      [budgetMoney, budgetHours, expectedDate, projectId]
+    const fields = [];
+    const values = [];
+    let i = 1;
+
+    for (const [key, value] of Object.entries(updates)) {
+      fields.push(`${key} = $${i++}`);
+      values.push(value);
+    }
+
+    values.push(projectId);
+
+    const result = await pool.query(
+      `UPDATE current_metrics SET ${fields.join(
+        ", "
+      )} WHERE project_id = $${i} RETURNING *`
     );
-    res.status(200).json(updateMetric.rows(0));
+    res.status(200).json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: "Error updating metrics" });
