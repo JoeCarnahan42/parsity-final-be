@@ -3,7 +3,6 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const pool = require("../dataBase/db");
 
-// TODO - Better user registration/ implement token
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
