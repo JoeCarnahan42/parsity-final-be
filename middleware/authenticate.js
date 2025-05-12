@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
-require("dotenv").config;
+require("dotenv").config();
 const JWT_KEY = process.env.SECRET_KEY;
 
 const authenticate = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    res.status(401).json({ error: "No token provided" });
+    return res.status(401).json({ error: "No token provided" });
   }
 
   try {
