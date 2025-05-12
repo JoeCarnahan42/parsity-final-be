@@ -41,26 +41,6 @@ router.post("/:id/projected-metrics", authenticate, async (req, res) => {
   }
 });
 
-router.get("/:id/projected-metrics", authenticate, async (req, res) => {
-  const projectId = req.params.id;
-
-  if (!projectId) {
-    res.status(400).json({ message: "Cannot find query without an ID" });
-  }
-
-  try {
-    const projectedMetrics = await pool.query(
-      "SELECT * FROM projected_metrics WHERE project_id = ($1)",
-      [projectId]
-    );
-    res.status(200).json(projectedMetrics.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Database Error" });
-  }
-});
-
-// Initial upload of current metrics
 router.post("/:id/current-metrics", authenticate, async (req, res) => {
   const projectId = req.params.id;
 
@@ -75,6 +55,25 @@ router.post("/:id/current-metrics", authenticate, async (req, res) => {
       [projectId, budgetMoney, budgetHours, expectedDate]
     );
     res.status(200).json(updateMetrics.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
+});
+
+router.get("/:id/projected-metrics", authenticate, async (req, res) => {
+  const projectId = req.params.id;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
+  try {
+    const projectedMetrics = await pool.query(
+      "SELECT * FROM projected_metrics WHERE project_id = ($1)",
+      [projectId]
+    );
+    res.status(200).json(projectedMetrics.rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Database Error" });
@@ -100,7 +99,6 @@ router.get("/:id/current-metrics", authenticate, async (req, res) => {
   }
 });
 
-// Dynamic updating of current metrics
 router.put("/:id/current-metrics", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
@@ -124,15 +122,88 @@ router.put("/:id/current-metrics", authenticate, async (req, res) => {
 
     values.push(projectId);
 
-    const result = await pool.query(
-      `UPDATE current_metrics SET ${fields.join(
-        ", "
-      )} WHERE project_id = $${i} RETURNING *`
+    const updatedMetrics = await pool.query(
+      `UPDATE current_metrics SET ${fields.join(", ")} WHERE project_id = ${
+        values[i]
+      } RETURNING *`
     );
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(updatedMetrics.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: "Error updating metrics" });
+  }
+});
+
+router.put("/:id/projected-metrics", authenticate, async (req, res) => {
+  const projectId = req.params.id;
+  const updates = req.body;
+
+  if (!projectId) {
+    res.status(400).json({ message: "Cannot find query without an ID" });
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: "No updates provided" });
+  }
+  try {
+    const fields = [];
+    const values = [];
+    let i = 1;
+
+    for (const [key, value] of Object.entries(updates)) {
+      fields.push(`${key} = $${i++}`);
+      values.push(value);
+    }
+
+    values.push(projectId);
+
+    const updatedMetrics = await pool.query(
+      `UPDATE projected_metrics SET ${fields.join(", ")} WHERE project_id = ${
+        values[i]
+      } RETURNING *`
+    );
+    res.status(200).json(updatedMetrics.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Error updating metrics" });
+  }
+});
+
+router.delete("/:id/current-metrics", authenticate, async (req, res) => {
+  const projectId = req.params.id;
+
+  if (!projectId) {
+    return res.status(400).json({ message: "No project id given" });
+  }
+
+  try {
+    const deletedMetric = await pool.query(
+      "DELETE FROM current_metrics WHERE project_id = $1",
+      [projectId]
+    );
+    res.status(200).json(deletedMetric.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
+});
+
+router.delete("/:id/projected-metrics", authenticate, async (req, res) => {
+  const projectId = req.params.id;
+
+  if (!projectId) {
+    return res.status(400).json({ message: "No project id given" });
+  }
+
+  try {
+    const deletedMetric = await pool.query(
+      "DELETE FROM projected_metrics WHERE project_id = $1",
+      [projectId]
+    );
+    res.status(200).json(deletedMetric.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
   }
 });
 

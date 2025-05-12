@@ -4,10 +4,10 @@ const pool = require("./dataBase/db");
 const loginRoutes = require("./routes/login");
 const registerRoutes = require("./routes/register");
 const metricRoutes = require("./routes/metrics");
-const pmRoutes = require("./routes/pm");
-const projRoutes = require("./routes/proj");
+const pmRoutes = require("./routes/projectManagers");
+const projRoutes = require("./routes/projects");
 const purchaseRoutes = require("./routes/purchase");
-const taskRoutes = require("./routes/task");
+const taskRoutes = require("./routes/tasks");
 const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -51,7 +51,7 @@ pool.connect().then((client) => {
   return client
     .query("SELECT NOW()")
     .then((res) => {
-      console.log("DB connected! Time:", res.rows[0].now);
+      console.log("DB connected!s");
       client.release();
     })
     .catch((err) => {

@@ -190,6 +190,41 @@ router.post("/", authenticate, async (req, res) => {
   }
 });
 
+router.put("/:id", authenticate, async (req, res) => {
+  const projectId = req.params.id;
+  const updates = req.body;
+
+  if (!projectId) {
+    return res.status(400).json({ message: "No project id given" });
+  }
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: "No updated provided" });
+  }
+
+  try {
+    const fields = [];
+    const values = [];
+    let i = 1;
+
+    for (const [key, value] of Object.entries(updates)) {
+      fields.push(`${key} = $${i++}`);
+      values.push(value);
+    }
+    values.push(projectId);
+    // TODO - Make the dynamic loops a helper method? reusable???
+
+    const updatedProjState = await pool.query(
+      `UPDATE projects SET ${fields.join(", ")} WHERE id = ${
+        values[i]
+      } RETURNING *`
+    );
+    res.status(200).json(updatedProjState.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
+});
+
 router.delete("/:id", authenticate, async (req, res) => {
   const projectId = req.params.id;
 

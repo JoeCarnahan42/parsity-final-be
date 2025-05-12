@@ -97,12 +97,28 @@ router.put("/:id/in-house", authenticate, async (req, res) => {
     res.status(400).json({ message: "Cannot find query without an ID" });
   }
 
-  const [title, partNumber, material, hours, status] = req.body;
+  const updates = req.body;
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: "No updates provided" });
+  }
 
   try {
+    const fields = [];
+    const values = [];
+    let i = 1;
+
+    for (const [key, value] of Object.entries(updates)) {
+      fields.push(`${key} = $${i++}`);
+      values.push(value);
+    }
+
+    values.push(projectId);
+
     const updatedTask = await pool.query(
-      "UPDATE in_house_tasks SET title = $1, part_number = $2, material = $3, hours = $4, status = $5 WHERE project_id = $6 RETURNING *",
-      [title, partNumber, material, hours, status, projectId]
+      `UPDATE in_house_tasks SET ${fields.join(", ")} WHERE project_id = ${
+        values[i]
+      }`
     );
     res.status(200).json(updatedTask.rows[0]);
   } catch (err) {

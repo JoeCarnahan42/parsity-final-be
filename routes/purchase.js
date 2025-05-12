@@ -99,12 +99,28 @@ router.put("/:id/purchase-list", authenticate, async (req, res) => {
     res.status(400).json({ message: "Cannot find query without an ID" });
   }
 
-  const [title, partNumber, description, orderedOn] = req.body;
+  const updates = req.body;
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ message: "No updated provided" });
+  }
 
   try {
+    const fields = [];
+    const values = [];
+    let i = 1;
+
+    for (const [key, value] of Object.entries(updates)) {
+      fields.push(`${key} = $${i++}`);
+      values.push(value);
+    }
+
+    values.push(projectId);
+
     const updatedPurchase = await pool.query(
-      "UPDATE purchase_list SET title = $1, part_number = $2, description = $3, ordered_on = $4 WHERE project_id = $5 RETURNING *",
-      [title, partNumber, description, orderedOn, projectId]
+      `UPDATE purchase_list SET ${fields.join(", ")} WHERE project_id = ${
+        values[i]
+      }`
     );
     res.status(200).json(updatedPurchase.rows[0]);
   } catch (err) {
