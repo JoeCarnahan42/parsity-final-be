@@ -121,9 +121,10 @@ router.put("/:id/current-metrics", authenticate, async (req, res) => {
     values.push(projectId);
 
     const updatedMetrics = await pool.query(
-      `UPDATE current_metrics SET ${fields.join(", ")} WHERE project_id = ${
-        values[i]
-      } RETURNING *`
+      `UPDATE current_metrics SET ${fields.join(
+        ", "
+      )} WHERE project_id = $${i} RETURNING *`,
+      values
     );
     res.status(200).json(updatedMetrics.rows[0]);
   } catch (err) {
@@ -170,9 +171,10 @@ router.put("/:id/projected-metrics", authenticate, async (req, res) => {
     values.push(projectId);
 
     const updatedMetrics = await pool.query(
-      `UPDATE projected_metrics SET ${fields.join(", ")} WHERE project_id = ${
-        values[i]
-      } RETURNING *`
+      `UPDATE projected_metrics SET ${fields.join(
+        ", "
+      )} WHERE project_id = $${i} RETURNING *`,
+      values
     );
     res.status(200).json(updatedMetrics.rows[0]);
   } catch (err) {

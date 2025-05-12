@@ -42,9 +42,10 @@ router.put("/:id/project-managers", authenticate, async (req, res) => {
     values.push(projectId);
 
     const updatedManager = await pool.query(
-      `UPDATE project_managers SET ${fields.join(", ")} WHERE project_id = ${
-        values[i]
-      }`
+      `UPDATE project_managers SET ${fields.join(
+        ", "
+      )} WHERE project_id = $${i} RETURNING *`,
+      values
     );
     res.status(200).json(updatedManager.rows[0]);
   } catch (err) {

@@ -1,13 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const pool = require("./dataBase/db");
-const loginRoutes = require("./routes/login");
-const registerRoutes = require("./routes/register");
-const metricRoutes = require("./routes/metrics");
-const pmRoutes = require("./routes/projectManagers");
-const projRoutes = require("./routes/projects");
-const purchaseRoutes = require("./routes/purchase");
-const taskRoutes = require("./routes/tasks");
 const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -24,6 +17,14 @@ app.use(
     extended: true,
   })
 );
+
+const loginRoutes = require("./routes/login");
+const registerRoutes = require("./routes/register");
+const metricRoutes = require("./routes/metrics");
+const pmRoutes = require("./routes/projectManagers");
+const projRoutes = require("./routes/projects");
+const purchaseRoutes = require("./routes/purchase");
+const taskRoutes = require("./routes/tasks");
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");

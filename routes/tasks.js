@@ -88,6 +88,18 @@ router.put("/:id/in-house", authenticate, async (req, res) => {
     return res.status(400).json({ message: "No updates provided" });
   }
 
+  const invalidFields = Object.keys(updates).filter(
+    (key) => !allowedFields.includes(key)
+  );
+
+  if (invalidFields.length > 0) {
+    return res.status(400).json({
+      message: `These fields are not valid for this table: ${invalidFields.join(
+        ", "
+      )}`,
+    });
+  }
+
   try {
     const fields = [];
     const values = [];
@@ -101,9 +113,10 @@ router.put("/:id/in-house", authenticate, async (req, res) => {
     values.push(projectId);
 
     const updatedTask = await pool.query(
-      `UPDATE in_house_tasks SET ${fields.join(", ")} WHERE project_id = ${
-        values[i]
-      }`
+      `UPDATE in_house_tasks SET ${fields.join(
+        ", "
+      )} WHERE project_id = $${i} RETURNING *`,
+      values
     );
     res.status(200).json(updatedTask.rows[0]);
   } catch (err) {

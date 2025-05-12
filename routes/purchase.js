@@ -122,9 +122,10 @@ router.put("/:id/purchase-list", authenticate, async (req, res) => {
     values.push(projectId);
 
     const updatedPurchase = await pool.query(
-      `UPDATE purchase_list SET ${fields.join(", ")} WHERE project_id = ${
-        values[i]
-      }`
+      `UPDATE purchase_list SET ${fields.join(
+        ", "
+      )} WHERE project_id = $${i} RETURNING *`,
+      values
     );
     res.status(200).json(updatedPurchase.rows[0]);
   } catch (err) {

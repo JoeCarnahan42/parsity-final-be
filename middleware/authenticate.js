@@ -4,6 +4,7 @@ const JWT_KEY = process.env.SECRET_KEY;
 
 const authenticate = (req, res, next) => {
   const token = req.cookies.token;
+  console.log(req.cookies.token);
 
   if (!token) {
     return res.status(401).json({ error: "No token provided" });
