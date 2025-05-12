@@ -2,6 +2,7 @@ const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+const JWT_KEY = process.env.SECRET_KEY;
 
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
