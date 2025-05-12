@@ -102,6 +102,7 @@ router.get("/:id/current-metrics", authenticate, async (req, res) => {
 router.put("/:id/current-metrics", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
+  const allowedFields = ["budget_money", "budget_hours", "expected_date"];
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });
@@ -110,6 +111,19 @@ router.put("/:id/current-metrics", authenticate, async (req, res) => {
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ message: "No updates provided" });
   }
+
+  const invalidFields = Object.keys(updates).filter(
+    (key) => !allowedFields.includes(key)
+  );
+
+  if (invalidFields.length > 0) {
+    return res.status(400).json({
+      message: `These fields are not valid for this table: ${invalidFields.join(
+        ", "
+      )}`,
+    });
+  }
+
   try {
     const fields = [];
     const values = [];
@@ -137,6 +151,7 @@ router.put("/:id/current-metrics", authenticate, async (req, res) => {
 router.put("/:id/projected-metrics", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
+  const allowedFields = ["budget_money", "budget_hours", "due_date"];
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });
@@ -145,6 +160,19 @@ router.put("/:id/projected-metrics", authenticate, async (req, res) => {
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ message: "No updates provided" });
   }
+
+  const invalidFields = Object.keys(updates).filter(
+    (key) => !allowedFields.includes(key)
+  );
+
+  if (invalidFields.length > 0) {
+    return res.status(400).json({
+      message: `These fields are not valid for this table: ${invalidFields.join(
+        ", "
+      )}`,
+    });
+  }
+
   try {
     const fields = [];
     const values = [];

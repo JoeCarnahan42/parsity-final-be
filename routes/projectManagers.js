@@ -24,6 +24,7 @@ const authenticate = (req, res, next) => {
 router.put("/:id/project-managers", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
+  const allowedFields = ["name", "title"];
 
   if (!projectId) {
     return res.status(400).json({ message: "No id given" });
@@ -31,6 +32,18 @@ router.put("/:id/project-managers", authenticate, async (req, res) => {
 
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ message: "No updates given" });
+  }
+
+  const invalidFields = Object.keys(updates).filter(
+    (key) => !allowedFields.includes(key)
+  );
+
+  if (invalidFields.length > 0) {
+    return res.status(400).json({
+      message: `These fields are not valid for this table: ${invalidFields.join(
+        ", "
+      )}`,
+    });
   }
 
   try {

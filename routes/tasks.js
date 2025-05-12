@@ -92,6 +92,7 @@ router.delete("/:id/in-house", authenticate, async (req, res) => {
 
 router.put("/:id/in-house", authenticate, async (req, res) => {
   const projectId = req.params.id;
+  const allowedFields = ["title", "partnumber", "material", "hours", "status"];
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });

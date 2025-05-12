@@ -94,6 +94,14 @@ router.delete("/:id/purchase-list", authenticate, async (req, res) => {
 
 router.put("/:id/purchase-list", authenticate, async (req, res) => {
   const projectId = req.params.id;
+  const allowedFields = [
+    "title",
+    "partnumber",
+    "description",
+    "ordered_on",
+    "price",
+    "quantity",
+  ];
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });
@@ -103,6 +111,18 @@ router.put("/:id/purchase-list", authenticate, async (req, res) => {
 
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ message: "No updated provided" });
+  }
+
+  const invalidFields = Object.keys(updates).filter(
+    (key) => !allowedFields.includes(key)
+  );
+
+  if (invalidFields.length > 0) {
+    return res.status(400).json({
+      message: `These fields are not valid for this table: ${invalidFields.join(
+        ", "
+      )}`,
+    });
   }
 
   try {
