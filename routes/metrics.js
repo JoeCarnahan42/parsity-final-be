@@ -193,7 +193,7 @@ router.delete("/:id/current-metrics", authenticate, async (req, res) => {
   try {
     const deletedMetric = await pool.query(
       "DELETE FROM current_metrics WHERE project_id = $1",
-      [projectId]
+      projectId
     );
     res.status(200).json(deletedMetric.rows[0]);
   } catch (err) {
@@ -212,7 +212,7 @@ router.delete("/:id/projected-metrics", authenticate, async (req, res) => {
   try {
     const deletedMetric = await pool.query(
       "DELETE FROM projected_metrics WHERE project_id = $1",
-      [projectId]
+      projectId
     );
     res.status(200).json(deletedMetric.rows[0]);
   } catch (err) {

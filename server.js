@@ -25,6 +25,8 @@ const pmRoutes = require("./routes/projectManagers");
 const projRoutes = require("./routes/projects");
 const purchaseRoutes = require("./routes/purchase");
 const taskRoutes = require("./routes/tasks");
+const commentRoutes = require("./routes/comments");
+const materialRoutes = require("./routes/material");
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -43,6 +45,8 @@ app.use("/pm", pmRoutes);
 app.use("/projects", projRoutes);
 app.use("/purchases", purchaseRoutes);
 app.use("/tasks", taskRoutes);
+app.use("/materials", materialRoutes);
+app.use("/comments", commentRoutes);
 
 app.listen(8000, () => {
   console.log("Node.js listening on port " + 8000);
