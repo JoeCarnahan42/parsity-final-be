@@ -104,3 +104,5 @@ router.delete("/:id/materials", authenticate, async (req, res) => {
     res.status(500).json({ message: "Database Error" });
   }
 });
+
+module.exports = router;
