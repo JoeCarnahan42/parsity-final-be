@@ -32,11 +32,11 @@ router.post("/:id/current-metrics", authenticate, async (req, res) => {
     res.status(400).json({ message: "Cannot find query without an ID" });
   }
 
-  const { budgetMoney, budgetHours, expectedDate } = req.body;
+  const { budgetMoney, budgetHours, expectedDate, totalSpent } = req.body; // NOTE: total spent should be a precalculated value
   try {
     const updateMetrics = await pool.query(
-      "INSERT INTO current_metrics (project_id, budget_money, budget_hours, expected_date) VALUES ($1, $2, $3, $4) RETURNING *",
-      [projectId, budgetMoney, budgetHours, expectedDate]
+      "INSERT INTO current_metrics (project_id, budget_money, budget_hours, expected_date, total_spent) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [projectId, budgetMoney, budgetHours, expectedDate, totalSpent]
     );
     res.status(200).json(updateMetrics.rows[0]);
   } catch (err) {

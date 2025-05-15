@@ -5,13 +5,13 @@ const pool = require("../dataBase/db");
 
 const authenticate = require("../middleware/authenticate");
 
-router.get("/:id/materials", authenticate, async (req, res) => {
+router.get("/:id", authenticate, async (req, res) => {
   const projectId = req.params.id;
 
   try {
     const getMats = await pool.query(
-      "SELECT * FROM materials WHERE project_id = $1 RETURNING *",
-      projectId
+      "SELECT * FROM material WHERE project_id = $1",
+      [projectId]
     );
     res.status(200).json(getMats.rows);
   } catch (err) {
@@ -20,13 +20,13 @@ router.get("/:id/materials", authenticate, async (req, res) => {
   }
 });
 
-router.post("/:id/materials", authenticate, async (req, res) => {
+router.post("/:id", authenticate, async (req, res) => {
   const projectId = req.params.id;
-  const [description, price, forPartNumber, orderedOn] = req.body;
+  const { description, price, forPartNumber, orderedOn } = req.body;
 
   try {
     const addMaterial = await pool.query(
-      "INSERT INTO blockers (description, price, for_partnumber, ordered_on, project_id) VALUES ($1, $2, $3, $3, $4, $5)",
+      "INSERT INTO material (description, price, for_partnumber, ordered_on, project_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [description, price, forPartNumber, orderedOn, projectId]
     );
     res.status(200).json(addMaterial.rows[0]);
@@ -36,8 +36,8 @@ router.post("/:id/materials", authenticate, async (req, res) => {
   }
 });
 
-router.put("/:id/materials", authenticate, async (req, res) => {
-  const projectId = req.params.id;
+router.put("/:id/:materialId", authenticate, async (req, res) => {
+  const { id, materialId } = req.params;
   const updates = req.body;
   const allowedFields = [
     "description",
@@ -46,8 +46,11 @@ router.put("/:id/materials", authenticate, async (req, res) => {
     "ordered_on",
   ];
 
-  if (!projectId) {
+  if (!id) {
     return res.status(400).json({ message: "No project ID provided" });
+  }
+  if (!materialId) {
+    return res.status(400).json({ message: "No project material ID provided" });
   }
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ message: "No updates given" });
@@ -78,9 +81,9 @@ router.put("/:id/materials", authenticate, async (req, res) => {
     values.push(projectId);
 
     const updateMats = await pool.query(
-      `UPDATE materials SET ${fields.join(
+      `UPDATE material SET ${fields.join(
         ", "
-      )} WHERE project_id = $${i} RETURNING *`,
+      )} WHERE project_id = $${i} AND id = $${materialId} RETURNING *`, // TODO - fix put route
       values
     );
     res.status(200).json(updateMats.rows[0]);
@@ -90,13 +93,14 @@ router.put("/:id/materials", authenticate, async (req, res) => {
   }
 });
 
-router.delete("/:id/materials", authenticate, async (req, res) => {
+router.delete("/:id", authenticate, async (req, res) => {
   const projectId = req.params.id;
+  const materialId = req.body;
 
   try {
     const deleteMats = await pool.query(
-      "DELETE FROM materials WHERE project_id = $1 RETURNING *",
-      projectId
+      "DELETE FROM material WHERE project_id = $1 AND id = $2 RETURNING *",
+      [projectId, materialId]
     );
     res.status(200).json(deleteMats.rows[0]);
   } catch (err) {

@@ -42,7 +42,7 @@ router.get("/:id/blockers", authenticate, async (req, res) => {
 
 router.post("/:id/comments", authenticate, async (req, res) => {
   const projectId = req.params.id;
-  const [comment, date] = req.body;
+  const { comment, date } = req.body;
 
   if (!projectId) {
     return res.status(400).json({ message: "No project ID provided" });
@@ -62,7 +62,7 @@ router.post("/:id/comments", authenticate, async (req, res) => {
 
 router.post("/:id/blockers", authenticate, async (req, res) => {
   const projectId = req.params.id;
-  const [type, severity, description, status, date] = req.body;
+  const { type, severity, description, status, date } = req.body;
 
   if (!projectId) {
     return res.status(400).json({ message: "No project ID provided" });
@@ -83,7 +83,7 @@ router.post("/:id/blockers", authenticate, async (req, res) => {
 router.put("/:id/comments", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
-  const allowedFields = ["type", "severity", "description", "status", "date"];
+  const allowedFields = ["comment"];
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });
@@ -133,7 +133,7 @@ router.put("/:id/comments", authenticate, async (req, res) => {
 router.put("/:id/blockers", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
-  const allowedFields = ["comment"];
+  const allowedFields = ["type", "severity", "description", "status", "date"];
 
   if (!projectId) {
     res.status(400).json({ message: "Cannot find query without an ID" });

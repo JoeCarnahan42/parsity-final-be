@@ -40,34 +40,46 @@ router.post("/", authenticate, async (req, res) => {
   const {
     title,
     customer,
-    state,
+    state, // STATE OPTIONS - Quoting, Processing, Kicked Off, In Production, Debug, Runoff, Shipping, Install
+    type, // TYPE OPTIONS - Batch, Build
+    description,
     projectManagers,
     tasks,
     projMetrics,
     purchaseList,
   } = req.body;
 
-  if (
-    !title ||
-    !customer ||
-    !state ||
-    !Array.isArray(projectManagers) ||
-    !projectManagers.length ||
-    !Array.isArray(tasks) ||
-    !tasks.length ||
-    !Array.isArray(projMetrics) ||
-    !projMetrics.length ||
-    !Array.isArray(purchaseList) ||
-    !purchaseList.length
-  ) {
-    return res.status(400).json({ message: "All fields are required." });
+  const missingFields = [];
+
+  if (!title) missingFields.push("title");
+  if (!customer) missingFields.push("customer");
+  if (!state) missingFields.push("state");
+  if (!type) missingFields.push("type");
+
+  if (!Array.isArray(projectManagers) || !projectManagers.length) {
+    missingFields.push("projectManagers");
+  }
+  if (!Array.isArray(tasks) || !tasks.length) {
+    missingFields.push("tasks");
+  }
+  if (!Array.isArray(projMetrics) || !projMetrics.length) {
+    missingFields.push("projMetrics");
+  }
+  if (!Array.isArray(purchaseList) || !purchaseList.length) {
+    missingFields.push("purchaseList");
+  }
+
+  if (missingFields.length) {
+    return res.status(400).json({
+      message: `Missing or invalid fields: ${missingFields.join(", ")}`,
+    });
   }
 
   try {
     await client.query("BEGIN");
     const addToProjects = await client.query(
-      "INSERT INTO projects (title, customer, state) VALUES ($1, $2, $3) RETURNING id",
-      [title, customer, state]
+      "INSERT INTO projects (title, customer, state, type, description) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+      [title, customer, state, type, description]
     );
     const projectId = addToProjects.rows[0].id;
 
@@ -82,14 +94,15 @@ router.post("/", authenticate, async (req, res) => {
             idx + 6
           }, $${idx + 7})`
         );
+        const today = new Date().toISOString().split("T")[0];
         params.push(
           projectId,
           task.title,
           task.partNumber,
           task.material,
           task.hours,
-          task.status,
-          task.created
+          task.status, // STATUS OPTIONS - Pending, In Progress, Completed
+          today
         );
       });
       await client.query(
