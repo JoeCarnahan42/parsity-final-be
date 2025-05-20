@@ -1,0 +1,169 @@
+swagger: "2.0"
+info:
+  title: Project Management API
+  description: An API for creating and updating projects
+  version: 1.0.0
+host: localhost
+schemes:
+  - https
+basePath: /
+produces:
+  - application/json
+paths:
+  /login/:
+    post:
+      summary: User login
+      description: |
+        The login endpoint allows a user to log in to their account and view the user dashboard
+      parameters:
+        - name: email
+          in: body
+          description: User email
+          required: true
+          type: string
+        - name: password
+          in: body
+          description: User password
+          required: true
+          type: string
+      tags:
+        - Login
+      responses:
+        "200":
+          description: Successfull login
+          schema:
+            type: string
+        "400":
+          description: Incorrectly formatted response
+          schema:
+            type: string
+        "401":
+          description: Invalid email or password
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+  /login/:id/users:
+    delete:
+      summary: Delete a user
+      description: |
+        Deletes a user by a given id
+      parameters:
+        - name: userId
+          in: params
+          description: A user ID
+          required: true
+          type: number
+      tags:
+        - Delete
+      responses:
+        "200":
+          description: An object of the deleted user
+          schema:
+            type: object
+        "400":
+          description: An error due to not inputting an ID
+          schema:
+            type: string
+        "500":
+          description: An error deleting the user
+          schema:
+            type: string
+  /metrics/:id/projected-metrics:
+    get:
+      summary: Original projected metrics
+      description: |
+        Returns original project metrics from project origination
+      parameters:
+        - name: id
+          in: params
+          description: project id
+          required: true
+          type: number
+      tags:
+        - Metrics
+      responses:
+        "200":
+          description: Projected metrics for the given project
+        "400":
+          description: Error for no ID given
+        "500":
+          description: Database error
+    post:
+      summary: Initial setting of metrics
+      description: |
+        Updates DB with the initial setting of projected metrics
+      parameters:
+        - name: id
+          in: params
+          description: project id
+          required: true
+          type: number
+        - name: budgetMoney
+          in: body
+          description: projected budget in money
+          required: true
+          type: string
+        - name: budgetHours
+          in: body
+          description: projected budgeted hours
+          required: true
+          type: string
+        - name: dueDate
+          in: body
+          description: projected due date of project
+          required: true
+          type: string
+      tags:
+        - Metrics
+      responses:
+        "200":
+          description: Returns the newly added projected metrics
+
+  /metrics/:id/current-metrics:
+    get:
+      summary: Updated project metrics
+      description: |
+        Returns updated/current project metrics
+      parameters:
+        - name: id
+          in: params
+          description: project id
+          required: true
+          type: number
+      tags:
+        - Metrics
+      responses:
+        "200":
+          description: Updated metrics for a given project
+        "400":
+          description: No project ID given
+        "500":
+          description: Database error
+    post:
+      summary: Update project metrics
+      description: |
+        Initial update of metrics
+      parameters:
+        - name: id
+          in: params
+          description: project id
+          required: true
+          type: number
+        - name: budgetMoney
+          in: body
+          description: Updated monetary budget
+          required: true
+          type: string
+        - name: budgetHours
+          in: body
+          description: Updated hours budget
+          required: true
+          type: string
+        - name: expectedDate
+          in: body
+          description: New expected completion date
+          required: true
+          type: string
