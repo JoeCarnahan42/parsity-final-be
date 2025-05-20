@@ -56,7 +56,7 @@ pool.connect().then((client) => {
   return client
     .query("SELECT NOW()")
     .then((res) => {
-      console.log("DB connected!s");
+      console.log("DB Connected");
       client.release();
     })
     .catch((err) => {
