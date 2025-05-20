@@ -48,8 +48,10 @@ app.use("/tasks", taskRoutes);
 app.use("/materials", materialRoutes);
 app.use("/comments", commentRoutes);
 
-app.listen(8000, () => {
-  console.log("Node.js listening on port " + 8000);
+const PORT = process.env.PORT || 8000;
+
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
 
 pool.connect().then((client) => {
