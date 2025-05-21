@@ -28,13 +28,16 @@ const taskRoutes = require("./routes/tasks");
 const commentRoutes = require("./routes/comments");
 const materialRoutes = require("./routes/material");
 
+const allowedOrigin = "http://localhost:3000";
+
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", allowedOrigin);
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
   );
+  res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
 
