@@ -7,6 +7,19 @@ const JWT_KEY = process.env.SECRET_KEY;
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
 
+router.get("/check", authenticate, (req, res) => {
+  res.status(200).json({ user: req.user });
+});
+
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None",
+  });
+  res.status(200).json({ message: "Logged out successfully" });
+});
+
 router.post("/", async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
