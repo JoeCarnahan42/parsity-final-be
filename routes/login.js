@@ -44,6 +44,8 @@ router.post("/", async (req, res) => {
     const token = jwt.sign(
       {
         username: validUser.email,
+        firstName: validUser.first_name,
+        lastName: validUser.last_name,
       },
       JWT_KEY,
       { expiresIn: "60m" }
@@ -56,7 +58,9 @@ router.post("/", async (req, res) => {
       maxAge: 3600000, // 1 hour
     });
 
-    return res.status(200).json({ message: "Login Successful" });
+    return res
+      .status(200)
+      .json({ firstName: validUser.first_name, lastName: validUser.last_name });
   } catch (err) {
     return res.status(500).json({ message: "Server Error" });
   }
