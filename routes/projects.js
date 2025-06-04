@@ -189,7 +189,7 @@ router.post("/", authenticate, async (req, res) => {
         values.push(
           `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${
             idx + 6
-          })`
+          }, $${idx + 7})`
         );
         params.push(
           projectId,
@@ -197,7 +197,8 @@ router.post("/", authenticate, async (req, res) => {
           item.partNumber,
           item.description,
           item.orderedOn,
-          item.price
+          item.price,
+          item.quantity
         );
       });
       await client.query(
