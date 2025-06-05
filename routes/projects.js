@@ -202,7 +202,7 @@ router.post("/", authenticate, async (req, res) => {
         );
       });
       await client.query(
-        `INSERT INTO purchase_list (project_id, title, partnumber, description, ordered_on, price) VALUES ${values.join(
+        `INSERT INTO purchase_list (project_id, title, partnumber, description, ordered_on, price, quantity) VALUES ${values.join(
           ", "
         )}`,
         params
@@ -215,7 +215,7 @@ router.post("/", authenticate, async (req, res) => {
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Transaction Failed", err);
-    res.status(500).json({ message: "Project Creation Failed" });
+    res.status(500).json({ message: "Project Creation Failed", error: err });
   } finally {
     client.release();
   }
