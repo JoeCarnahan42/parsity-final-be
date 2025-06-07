@@ -19,9 +19,7 @@ router.get("/check", authenticate, async (req, res) => {
     const validUser = user.rows[0];
 
     res.status(200).json(validUser);
-  } catch {
-    res.status(400).json({ message: "Session Expired" });
-  }
+  } catch {}
 });
 
 router.post("/logout", (req, res) => {
