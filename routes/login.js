@@ -8,18 +8,21 @@ const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
 
 router.get("/check", authenticate, async (req, res) => {
+  const email = req.user.email;
   try {
-    const email = req.user.email;
-
-    const user = await pool.query(
-      "SELECT * FROM users WHERE email = $1 RETURNING *",
-      [email]
-    );
+    const user = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
 
     const validUser = user.rows[0];
 
-    res.status(200).json(validUser);
-  } catch {}
+    const { password, ...userWithoutPassword } = validUser;
+
+    res.status(200).json({ user: userWithoutPassword });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 router.post("/logout", (req, res) => {
