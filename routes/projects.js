@@ -209,9 +209,45 @@ router.post("/", authenticate, async (req, res) => {
       );
     }
     await client.query("COMMIT");
-    res
-      .status(200)
-      .json({ message: "Project Created Successfully!", projectId });
+
+    const projectResult = await pool.query(
+      "SELECT * FROM projects WHERE id = $1",
+      [projectId]
+    );
+
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    const project = projectResult.rows[0];
+
+    // Query related tables
+    const [tasksResult, managersResult, metricsResult, purchaseListResult] =
+      await Promise.all([
+        pool.query("SELECT * FROM in_house_tasks WHERE project_id = $1", [
+          projectId,
+        ]),
+        pool.query("SELECT * FROM project_managers WHERE project_id = $1", [
+          projectId,
+        ]),
+        pool.query("SELECT * FROM projected_metrics WHERE project_id = $1", [
+          projectId,
+        ]),
+        pool.query("SELECT * FROM purchase_list WHERE project_id = $1", [
+          projectId,
+        ]),
+      ]);
+
+    // Aggregate all data into one object
+    const fullProject = {
+      ...project,
+      tasks: tasksResult.rows,
+      projectManagers: managersResult.rows,
+      projectedMetrics: metricsResult.rows,
+      purchaseList: purchaseListResult.rows,
+    };
+
+    res.status(200).json(fullProject);
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Transaction Failed", err);
