@@ -7,8 +7,21 @@ const JWT_KEY = process.env.SECRET_KEY;
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
 
-router.get("/check", authenticate, (req, res) => {
-  res.status(200).json({ user: req.user });
+router.get("/check", authenticate, async (req, res) => {
+  try {
+    const email = req.user.email;
+
+    const user = await pool.query(
+      "SELECT * FROM users WHERE email = $1 RETURNING *",
+      [email]
+    );
+
+    const validUser = user.rows[0];
+
+    res.status(200).json(validUser);
+  } catch {
+    res.status(400).json({ message: "Session Expired" });
+  }
 });
 
 router.post("/logout", (req, res) => {
