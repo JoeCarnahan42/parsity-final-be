@@ -55,6 +55,8 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ message: "Invalid Email or Password" });
     }
 
+    const { password, ...userWithoutPassword } = validUser;
+
     const token = jwt.sign(
       {
         email: validUser.email,
@@ -71,7 +73,7 @@ router.post("/", async (req, res) => {
       maxAge: 3600000, // 1 hour
     });
 
-    return res.status(200).json(validUser);
+    return res.status(200).json(userWithoutPassword);
   } catch (err) {
     return res.status(500).json({ message: "Server Error" });
   }
