@@ -80,6 +80,7 @@ router.post("/", authenticate, async (req, res) => {
     tasks,
     projMetrics,
     purchaseList,
+    materials,
   } = req.body;
 
   const missingFields = [];
@@ -100,6 +101,9 @@ router.post("/", authenticate, async (req, res) => {
   }
   if (!Array.isArray(purchaseList) || !purchaseList.length) {
     missingFields.push("purchaseList");
+  }
+  if (!Array.isArray(materials) || !materials.length) {
+    missingFields.push("materials");
   }
 
   if (missingFields.length) {
@@ -185,7 +189,7 @@ router.post("/", authenticate, async (req, res) => {
       const params = [];
 
       purchaseList.forEach((item, i) => {
-        const idx = i * 6;
+        const idx = i * 7;
         values.push(
           `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${
             idx + 6
@@ -208,6 +212,32 @@ router.post("/", authenticate, async (req, res) => {
         params
       );
     }
+
+    if (Array.isArray(materials) && materials.length > 0) {
+      const values = [];
+      const params = [];
+
+      purchaseList.forEach((material, i) => {
+        const idx = i * 5;
+        values.push(
+          `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}`
+        );
+        params.push(
+          projectId,
+          material.description,
+          material.forPartNumber,
+          material.orderedOn,
+          material.price
+        );
+      });
+      await client.query(
+        `INSERT INTO materials (project_id, description, for_partnumber, ordered_on, price) VALUES ${values.join(
+          ", "
+        )}`,
+        params
+      );
+    }
+
     await client.query("COMMIT");
 
     const projectResult = await pool.query(
