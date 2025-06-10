@@ -55,7 +55,7 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ message: "Invalid Email or Password" });
     }
 
-    const { password, ...userWithoutPassword } = validUser;
+    const { password: encryptedPassword, ...userWithoutPassword } = validUser;
 
     const token = jwt.sign(
       {
