@@ -36,21 +36,35 @@ router.get("/:id", authenticate, async (req, res) => {
     const project = projectResult.rows[0];
 
     // Query related tables
-    const [tasksResult, managersResult, metricsResult, purchaseListResult] =
-      await Promise.all([
-        pool.query("SELECT * FROM in_house_tasks WHERE project_id = $1", [
-          projectId,
-        ]),
-        pool.query("SELECT * FROM project_managers WHERE project_id = $1", [
-          projectId,
-        ]),
-        pool.query("SELECT * FROM projected_metrics WHERE project_id = $1", [
-          projectId,
-        ]),
-        pool.query("SELECT * FROM purchase_list WHERE project_id = $1", [
-          projectId,
-        ]),
-      ]);
+    const [
+      tasksResult,
+      managersResult,
+      metricsResult,
+      purchaseListResult,
+      commentsResult,
+      blockersResult,
+      materialResult,
+      currentMetricResult,
+    ] = await Promise.all([
+      pool.query("SELECT * FROM in_house_tasks WHERE project_id = $1", [
+        projectId,
+      ]),
+      pool.query("SELECT * FROM project_managers WHERE project_id = $1", [
+        projectId,
+      ]),
+      pool.query("SELECT * FROM projected_metrics WHERE project_id = $1", [
+        projectId,
+      ]),
+      pool.query("SELECT * FROM purchase_list WHERE project_id = $1", [
+        projectId,
+      ]),
+      pool.query("SELECT * FROM comments WHERE project_id = $1", [projectId]),
+      pool.query("SELECT * FROM blockers WHERE project_id = $1", [projectId]),
+      pool.query("SELECT * FROM material WHERE project_id = $1", [projectId]),
+      pool.query("SELECT * FROM current_metrics WHERE project_id = $1", [
+        projectId,
+      ]),
+    ]);
 
     // Aggregate all data into one object
     const fullProject = {
@@ -59,6 +73,10 @@ router.get("/:id", authenticate, async (req, res) => {
       projectManagers: managersResult.rows,
       projectedMetrics: metricsResult.rows,
       purchaseList: purchaseListResult.rows,
+      comments: commentsResult.rows,
+      blockers: blockersResult.rows,
+      material: materialResult.rows,
+      currentMetrics: currentMetricResult.rows,
     };
 
     res.status(200).json(fullProject);
