@@ -11,7 +11,7 @@ router.get("/comments&blockers", authenticate, async (req, res) => {
     const getAllBlockers = await pool.query("SELECT * FROM blockers");
     res
       .status(200)
-      .json({ comments: getAllComments, blockers: getAllBlockers });
+      .json({ comments: getAllComments.rows, blockers: getAllBlockers.rows });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Database Error" });
