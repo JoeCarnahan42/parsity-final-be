@@ -5,10 +5,13 @@ const pool = require("../dataBase/db");
 
 const authenticate = require("../middleware/authenticate");
 
-router.get("/", authenticate, async (req, res) => {
+router.get("/comments&blockers", authenticate, async (req, res) => {
   try {
     const getAllComments = await pool.query("SELECT * FROM comments");
-    res.status(200).json(getAllComments.rows);
+    const getAllBlockers = await pool.query("SELECT * FROM blockers");
+    res
+      .status(200)
+      .json({ comments: getAllComments, blockers: getAllBlockers });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Database Error" });
