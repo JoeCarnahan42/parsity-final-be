@@ -5,7 +5,7 @@ const pool = require("../dataBase/db");
 
 const authenticate = require("../middleware/authenticate");
 
-router.get("/comments", authenticate, async (req, res) => {
+router.get("/", authenticate, async (req, res) => {
   try {
     const getAllComments = await pool.query("SELECT * FROM comments");
     res.status(200).json(getAllComments.rows);
