@@ -5,6 +5,16 @@ const pool = require("../dataBase/db");
 
 const authenticate = require("../middleware/authenticate");
 
+router.get("/comments", authenticate, async (req, res) => {
+  try {
+    const getAllComments = await pool.query("SELECT * FROM comments");
+    res.status(200).json(getAllComments.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Database Error" });
+  }
+});
+
 router.get("/:id/comments", authenticate, async (req, res) => {
   const projectId = req.params.id;
 
