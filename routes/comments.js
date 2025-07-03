@@ -55,7 +55,7 @@ router.get("/:id/blockers", authenticate, async (req, res) => {
 
 router.post("/:id/comments", authenticate, async (req, res) => {
   const projectId = req.params.id;
-  const { comment, date } = req.body;
+  const { comment, date, name } = req.body;
 
   if (!projectId) {
     return res.status(400).json({ message: "No project ID provided" });
@@ -63,8 +63,8 @@ router.post("/:id/comments", authenticate, async (req, res) => {
 
   try {
     const addComment = await pool.query(
-      "INSERT INTO comments (comment, date, project_id) VALUES ($1, $2, $3) RETURNING *",
-      [comment, date, projectId]
+      "INSERT INTO comments (comment, date, name, project_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [comment, date, name, projectId]
     );
     res.status(200).json(addComment.rows[0]);
   } catch (err) {
@@ -75,7 +75,7 @@ router.post("/:id/comments", authenticate, async (req, res) => {
 
 router.post("/:id/blockers", authenticate, async (req, res) => {
   const projectId = req.params.id;
-  const { type, severity, description, status, date } = req.body;
+  const { type, severity, description, status, date, name } = req.body;
 
   if (!projectId) {
     return res.status(400).json({ message: "No project ID provided" });
@@ -83,8 +83,8 @@ router.post("/:id/blockers", authenticate, async (req, res) => {
 
   try {
     const addBlocker = await pool.query(
-      "INSERT INTO blockers (type, severity, description, status, date, project_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [type, severity, description, status, date, projectId]
+      "INSERT INTO blockers (type, severity, description, status, date, name, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [type, severity, description, status, date, name, projectId]
     );
     res.status(200).json(addBlocker.rows[0]);
   } catch (err) {
