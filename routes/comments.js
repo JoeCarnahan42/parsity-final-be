@@ -193,8 +193,9 @@ router.put("/:id/blockers", authenticate, async (req, res) => {
   }
 });
 
-router.delete("/:id/comments", authenticate, async (req, res) => {
+router.delete("/:id/comments/:commentId", authenticate, async (req, res) => {
   const projectId = req.params.id;
+  const commentId = req.params.commentId;
 
   if (!projectId) {
     return res.status(400).json({ message: "No project ID given" });
@@ -202,8 +203,8 @@ router.delete("/:id/comments", authenticate, async (req, res) => {
 
   try {
     const deletedComment = await pool.query(
-      "DELETE FROM comments WHERE project_id = $1 RETURNING *",
-      projectId
+      "DELETE FROM comments WHERE project_id = $1 AND id = $2 RETURNING *",
+      [projectId, commentId]
     );
     res.status(200).json(deletedComment.rows[0]);
   } catch (err) {
