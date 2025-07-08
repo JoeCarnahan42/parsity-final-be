@@ -223,8 +223,7 @@ router.delete("/:id/blockers", authenticate, async (req, res) => {
   try {
     const deleteBlocker = await pool.query(
       "DELETE FROM blockers WHERE project_id = $1 AND id = $2 RETURNING *",
-      projectId,
-      blockerId
+      [projectId, blockerId]
     );
     res.status(200).json(deleteBlocker.rows[0]);
   } catch (err) {
