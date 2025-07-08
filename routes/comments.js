@@ -214,6 +214,7 @@ router.delete("/:id/comments", authenticate, async (req, res) => {
 
 router.delete("/:id/blockers", authenticate, async (req, res) => {
   const projectId = req.params.id;
+  const blockerId = req.body.id;
 
   if (!projectId) {
     return res.status(400).json({ message: "No project ID provided" });
@@ -221,8 +222,9 @@ router.delete("/:id/blockers", authenticate, async (req, res) => {
 
   try {
     const deleteBlocker = await pool.query(
-      "DELETE FROM blockers WHERE project_id = $1 RETURNING *",
-      projectId
+      "DELETE FROM blockers WHERE project_id = $1 AND id = $2 RETURNING *",
+      projectId,
+      blockerId
     );
     res.status(200).json(deleteBlocker.rows[0]);
   } catch (err) {
