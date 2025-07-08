@@ -212,9 +212,9 @@ router.delete("/:id/comments", authenticate, async (req, res) => {
   }
 });
 
-router.delete("/:id/blockers", authenticate, async (req, res) => {
+router.delete("/:id/blockers/:blockerId", authenticate, async (req, res) => {
   const projectId = req.params.id;
-  const blockerId = req.body.id;
+  const blockerId = req.params.blockerId;
 
   if (!projectId) {
     return res.status(400).json({ message: "No project ID provided" });
