@@ -93,6 +93,7 @@ router.post("/:id/blockers", authenticate, async (req, res) => {
   }
 });
 
+// UNUSED ROUTE : This route is unused due to the ease at which comments can be deleted and re-posted.
 router.put("/:id/comments", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
@@ -143,6 +144,7 @@ router.put("/:id/comments", authenticate, async (req, res) => {
   }
 });
 
+// UNUSED ROUTE : This route is unused due to the ease at which blockers can be deleted and re-posted.
 router.put("/:id/blockers", authenticate, async (req, res) => {
   const projectId = req.params.id;
   const updates = req.body;
