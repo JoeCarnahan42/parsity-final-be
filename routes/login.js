@@ -7,23 +7,28 @@ const JWT_KEY = process.env.SECRET_KEY;
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
 
-router.get("/check", authenticate, async (req, res) => {
-  const email = req.user.email;
-  try {
-    const user = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-
-    const validUser = user.rows[0];
-
-    const { password, ...userWithoutPassword } = validUser;
-
-    res.status(200).json({ user: userWithoutPassword });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+router.get(
+  "/check",
+  authenticate,
+  (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+  },
+  async (req, res) => {
+    const email = req.user.email;
+    try {
+      const user = await pool.query("SELECT * FROM users WHERE email = $1", [
+        email,
+      ]);
+      const validUser = user.rows[0];
+      const { password, ...userWithoutPassword } = validUser;
+      res.status(200).json({ user: userWithoutPassword });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Server error" });
+    }
   }
-});
+);
 
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
