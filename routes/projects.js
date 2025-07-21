@@ -342,10 +342,7 @@ router.put("/:id", authenticate, async (req, res) => {
     // TODO - Make the dynamic loops a helper method? reusable???
 
     const updatedProjState = await pool.query(
-      // SOMETHING NOT RIGHT WITH ID HERE
-      `UPDATE projects SET ${fields.join(
-        ", "
-      )} WHERE id = $${projectId} RETURNING *`,
+      `UPDATE projects SET ${fields.join(", ")} WHERE id = $${i} RETURNING *`,
       values
     );
     res.status(200).json(updatedProjState.rows[0]);
