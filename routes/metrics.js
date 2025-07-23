@@ -37,7 +37,7 @@ router.post("/:id/current-metrics", authenticate, async (req, res) => {
   try {
     const updateMetrics = await pool.query(
       "INSERT INTO current_metrics (project_id, budget_money, budget_hours, expected_date, total_spent) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [projectId, expected_date, budget_hours, budget_money, total_spent]
+      [projectId, budget_money, budget_hours, expected_date, total_spent]
     );
     res.status(200).json(updateMetrics.rows[0]);
   } catch (err) {
