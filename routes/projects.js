@@ -99,6 +99,7 @@ router.post("/", authenticate, async (req, res) => {
     projMetrics,
     purchaseList,
     materials,
+    salePrice,
   } = req.body;
 
   const missingFields = [];
@@ -107,6 +108,7 @@ router.post("/", authenticate, async (req, res) => {
   if (!customer) missingFields.push("customer");
   if (!state) missingFields.push("state");
   if (!type) missingFields.push("type");
+  if (!salePrice) missingFields.push("sale price");
 
   if (!Array.isArray(projectManagers) || !projectManagers.length) {
     missingFields.push("projectManagers");
@@ -133,8 +135,8 @@ router.post("/", authenticate, async (req, res) => {
   try {
     await client.query("BEGIN");
     const addToProjects = await client.query(
-      "INSERT INTO projects (title, customer, state, type, description) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-      [title, customer, state, type, description]
+      "INSERT INTO projects (title, customer, state, type, description, sale_price) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+      [title, customer, state, type, description, salePrice]
     );
     const projectId = addToProjects.rows[0].id;
 
