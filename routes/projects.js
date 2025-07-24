@@ -237,17 +237,17 @@ router.post("/", authenticate, async (req, res) => {
       const values = [];
       const params = [];
 
-      purchaseList.forEach((material, i) => {
+      materials.forEach((material, i) => {
         const idx = i * 5;
         values.push(
-          `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}`
+          `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5})`
         );
         params.push(
           projectId,
           material.description,
           material.forPartNumber,
           material.orderedOn,
-          material.price
+          Number(material.price)
         );
       });
       await client.query(
