@@ -250,10 +250,8 @@ router.post("/", authenticate, async (req, res) => {
           Number(material.price)
         );
       });
-      console.log("MATERIALS SQL:", values.join(", "));
-      console.log("MATERIALS PARAMS:", params);
       await client.query(
-        `INSERT INTO materials (project_id, description, for_partnumber, ordered_on, price) VALUES ${values.join(
+        `INSERT INTO material (project_id, description, for_partnumber, ordered_on, price) VALUES ${values.join(
           ", "
         )}`,
         params
