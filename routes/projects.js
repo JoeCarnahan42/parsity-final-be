@@ -91,7 +91,7 @@ router.post("/", authenticate, async (req, res) => {
   const {
     title,
     customer,
-    state, // STATE OPTIONS - Quoting, Processing, Kicked Off, In Production, Debug, Runoff, Shipping, Install
+    state, // STATE OPTIONS - Quoting, Processing, Kicked Off, In Production, Debug, Runoff, Shipping, Install, Complete
     type, // TYPE OPTIONS - Batch, Build
     description,
     projectManagers,
@@ -350,7 +350,7 @@ router.delete("/:id", authenticate, async (req, res) => {
 
   try {
     const deletedProj = await pool.query(
-      "DELETE FROM projects WHERE project_id = $1 RETURNING *",
+      "DELETE FROM projects WHERE id = $1 RETURNING *",
       [projectId]
     );
     res.status(200).json(deletedProj.rows[0]);
