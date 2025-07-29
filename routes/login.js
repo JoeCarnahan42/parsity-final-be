@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const passport = require("passport");
 const JWT_KEY = process.env.SECRET_KEY;
-const environment = process.env.NODE_ENV_DEV;
+const environment = process.env.NODE_ENV;
 
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
@@ -64,7 +64,7 @@ router.get(
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV,
     sameSite: "None",
   });
   res.status(200).json({ message: "Logged out successfully" });
