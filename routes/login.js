@@ -28,8 +28,8 @@ router.get(
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
+      secure: false, // required on localhost (not HTTPS)
+      sameSite: "Lax", // allows setting cookie from redirects to localhost
       maxAge: 3600000,
     });
 
