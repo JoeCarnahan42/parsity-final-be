@@ -17,7 +17,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "/login",
+    failureRedirect: "http://localhost:3000",
   }),
   (req, res) => {
     const { email, first_name } = req.user;
@@ -32,7 +32,7 @@ router.get(
       sameSite: "None",
       maxAge: 3600000,
     });
-
+    console.log("TOKEN: ", token);
     res.redirect("http://localhost:3000");
   }
 );
