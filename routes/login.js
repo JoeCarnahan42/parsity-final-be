@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const passport = require("passport");
 const JWT_KEY = process.env.SECRET_KEY;
-const environment = process.env.NODE_ENV;
+const environment = process.env.NODE_ENV === "production";
 
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
