@@ -35,7 +35,7 @@ router.get(
       maxAge: 3600000, // 1 Hour
     });
 
-    res.redirect("https://parsity-final-fe.vercel.app/");
+    res.json({ success: true });
   }
 );
 

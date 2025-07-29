@@ -8,7 +8,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/login/google/callback",
+      callbackURL:
+        "https://parsity-final-be.onrender.com/login/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
