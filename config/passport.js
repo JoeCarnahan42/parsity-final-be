@@ -15,7 +15,16 @@ passport.use(
         const email = profile.emails[0].value;
         const firstName = profile.name.givenName;
         const lastName = profile.name.familyName;
-        const dummyPasswordHash = await bcrypt.hash("GOOGLE_OAUTH_USER", 10);
+        const dummyPass = (length = 10) => {
+          const chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+          let result = "";
+          for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return result;
+        };
+        const dummyPasswordHash = await bcrypt.hash(dummyPass(), 10);
 
         let user = await pool.query("SELECT * FROM users WHERE email = $1", [
           email,
