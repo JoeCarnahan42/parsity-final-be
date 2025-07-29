@@ -13,6 +13,8 @@ passport.use(
       try {
         const email = profile.emails[0].value;
         const firstName = profile.name.givenName;
+        const lastName = profile.name.familyName;
+        const dummyPasswordHash = await bcrypt.hash("GOOGLE_OAUTH_USER", 10);
 
         let user = await pool.query("SELECT * FROM users WHERE email = $1", [
           email,
@@ -20,8 +22,8 @@ passport.use(
 
         if (user.rows.length === 0) {
           user = await pool.query(
-            "INSERT INTO users (email, first_name) VALUES ($1, $2) RETURNING *",
-            [email, firstName]
+            "INSERT INTO users (email, first_name, last_name, password) VALUES ($1, $2, $3, $4) RETURNING *",
+            [email, firstName, lastName, dummyPasswordHash]
           );
         }
 
