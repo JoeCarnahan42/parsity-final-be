@@ -33,7 +33,6 @@ router.get(
       maxAge: 3600000,
     });
 
-    res.json({ message: "Logged in", user: { email, firstName: first_name } });
     res.redirect("http://localhost:3000");
   }
 );
