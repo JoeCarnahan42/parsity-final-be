@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const passport = require("passport");
 const JWT_KEY = process.env.SECRET_KEY;
+const environment = process.env.NODE_ENV_DEV;
 
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
@@ -17,7 +18,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "http://localhost:3000",
+    failureRedirect: "https://parsity-final-fe.vercel.app/",
   }),
   (req, res) => {
     const { email, first_name } = req.user;
@@ -28,12 +29,12 @@ router.get(
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // required on localhost (not HTTPS)
-      sameSite: "Lax", // allows setting cookie from redirects to localhost
-      maxAge: 3600000,
+      secure: environment,
+      sameSite: "None",
+      maxAge: 3600000, // 1 Hour
     });
 
-    res.redirect("http://localhost:3000");
+    res.redirect("https://parsity-final-fe.vercel.app/");
   }
 );
 
@@ -103,7 +104,7 @@ router.post("/", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: environment,
       sameSite: "None",
       maxAge: 3600000, // 1 hour
     });
