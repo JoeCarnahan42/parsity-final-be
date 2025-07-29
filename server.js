@@ -4,6 +4,7 @@ const pool = require("./dataBase/db");
 const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
+const passport = require("./config/passport");
 
 const swaggerDoc = YAML.load("./swagger.yaml");
 
@@ -40,6 +41,8 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
+
+app.use(passport.initialize());
 
 app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);

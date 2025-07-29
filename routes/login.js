@@ -2,10 +2,40 @@ const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+const passport = require("passport");
 const JWT_KEY = process.env.SECRET_KEY;
 
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
+
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "/login",
+  }),
+  (req, res) => {
+    const { email, first_name } = req.user;
+
+    const token = jwt.sign({ email, firstName: first_name }, JWT_KEY, {
+      expiresIn: "60m",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      maxAge: 3600000,
+    });
+
+    res.redirect("/"); // or frontend dashboard route
+  }
+);
 
 router.get(
   "/check",
