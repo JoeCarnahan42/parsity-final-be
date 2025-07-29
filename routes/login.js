@@ -32,8 +32,9 @@ router.get(
       sameSite: "None",
       maxAge: 3600000,
     });
-    console.log("TOKEN: ", token);
+
     res.redirect("http://localhost:3000");
+    res.json({ message: "Logged in", user: { email, firstName: first_name } });
   }
 );
 
