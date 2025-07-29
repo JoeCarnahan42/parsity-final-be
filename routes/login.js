@@ -33,7 +33,7 @@ router.get(
       maxAge: 3600000,
     });
 
-    res.redirect("/"); // or frontend dashboard route
+    res.redirect("http://localhost:3000");
   }
 );
 
