@@ -29,7 +29,7 @@ const taskRoutes = require("./routes/tasks");
 const commentRoutes = require("./routes/comments");
 const materialRoutes = require("./routes/material");
 
-const allowedOrigin = "http://localhost:3000";
+const allowedOrigin = "http://https://parsity-final-fe.vercel.app/:3000";
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", allowedOrigin);
