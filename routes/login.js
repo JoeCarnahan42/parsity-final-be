@@ -5,6 +5,7 @@ require("dotenv").config();
 const passport = require("passport");
 const JWT_KEY = process.env.SECRET_KEY;
 const environment = process.env.NODE_ENV === "production";
+console.log(environment);
 
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
