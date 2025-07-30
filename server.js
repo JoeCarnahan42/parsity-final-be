@@ -45,6 +45,7 @@ app.use(
 console.log(process.env.SECRET_KEY);
 app.use(
   session({
+    name: "connect.sid",
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
