@@ -42,7 +42,8 @@ app.use(
   })
 );
 
-console.log(process.env.SECRET_KEY);
+app.use(express.static("public"));
+
 app.use(
   session({
     name: "connect.sid",
