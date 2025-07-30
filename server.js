@@ -6,6 +6,7 @@ const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const passport = require("./config/passport");
 const session = require("express-session");
+require("dotenv").config();
 
 const swaggerDoc = YAML.load("./swagger.yaml");
 
@@ -45,7 +46,7 @@ app.use((req, res, next) => {
 
 app.use(
   session({
-    secret: "your_super_secret_key",
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
     cookie: {
