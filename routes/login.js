@@ -16,6 +16,7 @@ router.get(
     failureRedirect: "https://parsity-final-fe.vercel.app/failure",
   }),
   (req, res) => {
+    console.log("✅ Google callback route hit, user:", req.user);
     req.session.save(() => {
       res.send(`
         <html>
