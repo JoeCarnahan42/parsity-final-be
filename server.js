@@ -32,12 +32,10 @@ const taskRoutes = require("./routes/tasks");
 const commentRoutes = require("./routes/comments");
 const materialRoutes = require("./routes/material");
 
-const allowedOrigin = "https://parsity-final-fe.vercel.app";
-
 app.use(
   cors({
-    origin: allowedOrigin,
-    credentials: true, // this is required to allow cookies
+    origin: "https://parsity-final-fe.vercel.app",
+    credentials: true,
   })
 );
 
