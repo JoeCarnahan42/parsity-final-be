@@ -13,10 +13,14 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
+    session: true,
     failureRedirect: "https://parsity-final-fe.vercel.app/failure",
   }),
   (req, res) => {
     console.log("✅ Google callback route hit, user:", req.user);
+    console.log("Session:", req.session); // logs the session object
+    console.log("Cookies:", req.cookies); // if using cookie-parser
+    console.log("User:", req.user); // should also be available
     req.session.save(() => {
       res.send(`
         <html>
