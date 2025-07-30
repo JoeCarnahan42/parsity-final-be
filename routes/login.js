@@ -61,12 +61,21 @@ router.get(
 );
 
 router.post("/logout", (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV,
-    sameSite: "None",
+  req.logout((err) => {
+    if (err) return res.status(500).send("Logout error");
+
+    req.session.destroy((err) => {
+      if (err) return res.status(500).send("Session destroy error");
+
+      res.clearCookie("connect.sid", {
+        path: "/",
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
+      res.status(200).json({ message: "Logged out successfully" });
+    });
   });
-  res.status(200).json({ message: "Logged out successfully" });
 });
 
 router.delete("/:id/users", authenticate, async (req, res) => {
