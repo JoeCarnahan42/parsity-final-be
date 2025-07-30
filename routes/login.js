@@ -23,7 +23,7 @@ router.get(
       console.log("✅ Auth success, user is:", req.user);
       console.log("✅ Session object is:", req.session);
 
-      res.redirect("https://parsity-final-fe.vercel.app/post-login");
+      res.sendFile(path.join(__dirname, "../public/oauth-redirect.html"));
     });
   }
 );
