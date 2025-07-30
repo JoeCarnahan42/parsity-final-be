@@ -29,7 +29,7 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: "https://parsity-final-fe.onrender.com/",
+    origin: "https://parsity-final-fe.onrender.com",
     credentials: true,
   })
 );
