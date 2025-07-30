@@ -50,6 +50,7 @@ router.get(
 );
 
 router.get("/auth/user", (req, res) => {
+  console.log("Auth route hit. Session:", req.session);
   if (req.isAuthenticated()) {
     res.json({ user: req.user });
   } else {
