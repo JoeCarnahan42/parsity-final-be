@@ -16,7 +16,16 @@ router.get(
     failureRedirect: "https://parsity-final-fe.vercel.app/",
   }),
   (req, res) => {
-    res.redirect("https://parsity-final-fe.vercel.app/");
+    res.send(`
+      <html>
+        <body>
+          <script>
+            window.opener.postMessage({ loggedIn: true }, "https://parsity-final-fe.vercel.app");
+            window.close();
+          </script>
+        </body>
+      </html>
+    `);
   }
 );
 
