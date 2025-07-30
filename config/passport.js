@@ -31,6 +31,7 @@ passport.use(
           );
         }
 
+        console.log(user.rows[0]);
         return done(null, user.rows[0]);
       } catch (err) {
         return done(err, null);
