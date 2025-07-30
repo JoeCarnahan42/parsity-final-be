@@ -7,6 +7,7 @@ const YAML = require("yamljs");
 const passport = require("./config/passport");
 const session = require("express-session");
 require("dotenv").config();
+const cors = require("cors");
 
 const swaggerDoc = YAML.load("./swagger.yaml");
 
@@ -33,10 +34,12 @@ const materialRoutes = require("./routes/material");
 
 const allowedOrigin = "https://parsity-final-fe.vercel.app";
 
-cors({
-  origin: "https://parsity-final-fe.vercel.app",
-  credentials: true,
-});
+app.use(
+  cors({
+    origin: "https://parsity-final-fe.vercel.app",
+    credentials: true,
+  })
+);
 
 app.use(
   session({
