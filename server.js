@@ -19,14 +19,6 @@ app.use(
   })
 );
 
-app.options(
-  "/*",
-  cors({
-    origin: "https://parsity-final-fe.vercel.app",
-    credentials: true,
-  })
-);
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use(cookieParser());
 app.use(bodyParser.json());
