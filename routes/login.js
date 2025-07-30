@@ -22,17 +22,12 @@ router.get(
   (req, res) => {
     req.login(req.user, (err) => {
       if (err) return next(err);
-
-      console.log("✅ Auth success, user is:", req.user);
-      console.log("✅ Session object is:", req.session);
-
       res.redirect("https://parsity-final-fe.onrender.com/");
     });
   }
 );
 
 router.get("/auth/user", (req, res) => {
-  console.log("Auth route hit. Session:", req.session);
   if (req.isAuthenticated()) {
     res.json({ user: req.user });
   } else {
