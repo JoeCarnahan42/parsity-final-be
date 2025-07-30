@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const passport = require("./config/passport");
-import session from "express-session";
+const session = require("express-session");
 
 const swaggerDoc = YAML.load("./swagger.yaml");
 
