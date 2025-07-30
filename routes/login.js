@@ -23,7 +23,7 @@ router.get(
           <body>
             <script>
               window.opener.postMessage({ loggedIn: true }, "https://parsity-final-fe.vercel.app");
-              
+              window.close();
             </script>
           </body>
         </html>
