@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const passport = require("./config/passport");
+import session from "express-session";
 
 const swaggerDoc = YAML.load("./swagger.yaml");
 
@@ -42,7 +43,22 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(
+  session({
+    secret: "your_super_secret_key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 60 * 60 * 1000, // 1 Hour
+    },
+  })
+);
+
 app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);

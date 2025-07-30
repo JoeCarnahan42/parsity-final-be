@@ -16,16 +16,9 @@ passport.use(
         const email = profile.emails[0].value;
         const firstName = profile.name.givenName;
         const lastName = profile.name.familyName;
-        const dummyPass = (length = 10) => {
-          const chars =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-          let result = "";
-          for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-          }
-          return result;
-        };
-        const dummyPasswordHash = await bcrypt.hash(dummyPass(), 10);
+
+        const dummyPassword = Math.random().toString(36).slice(-10);
+        const dummyPasswordHash = await bcrypt.hash(dummyPassword, 10);
 
         let user = await pool.query("SELECT * FROM users WHERE email = $1", [
           email,
@@ -45,5 +38,23 @@ passport.use(
     }
   )
 );
+
+// Serialize user ID into session cookie
+passport.serializeUser((user, done) => {
+  done(null, user.id); // assuming 'id' is your primary key column name
+});
+
+// Deserialize user by ID on each request to get full user info
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    if (user.rows.length === 0) {
+      return done(null, false);
+    }
+    done(null, user.rows[0]);
+  } catch (err) {
+    done(err, null);
+  }
+});
 
 module.exports = passport;
