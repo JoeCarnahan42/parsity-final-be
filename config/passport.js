@@ -42,7 +42,8 @@ passport.use(
 
 // Serialize user ID into session cookie
 passport.serializeUser((user, done) => {
-  done(null, user.id); // assuming 'id' is your primary key column name
+  console.log("SERIALIZED:", user.id);
+  done(null, user.id);
 });
 
 // Deserialize user by ID on each request to get full user info
