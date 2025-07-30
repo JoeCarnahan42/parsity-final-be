@@ -1,7 +1,7 @@
 const router = require("express").Router();
 require("dotenv").config();
 const passport = require("passport");
-const path = require("path");
+
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
 
@@ -23,7 +23,7 @@ router.get(
       console.log("✅ Auth success, user is:", req.user);
       console.log("✅ Session object is:", req.session);
 
-      res.sendFile(path.join(__dirname, "../public/oauth-redirect.html"));
+      res.redirect("https://parsity-final-fe.vercel.app/post-login");
     });
   }
 );
