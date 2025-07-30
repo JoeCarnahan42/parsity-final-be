@@ -53,7 +53,7 @@ passport.deserializeUser(async (id, done) => {
     if (user.rows.length === 0) {
       return done(null, false);
     }
-    console.log(user.rows[0]);
+    console.log("DESERIALIZED", user.rows[0]);
     done(null, user.rows[0]);
   } catch (err) {
     done(err, null);
