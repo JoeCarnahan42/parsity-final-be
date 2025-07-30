@@ -41,6 +41,11 @@ app.use(
   })
 );
 
+app.options(
+  "*",
+  cors({ origin: "https://parsity-final-fe.vercel.app", credentials: true })
+);
+
 app.use(
   session({
     secret: process.env.SECRET_KEY,
