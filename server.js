@@ -20,7 +20,7 @@ app.use(
 );
 
 app.options(
-  "*",
+  "/*",
   cors({
     origin: "https://parsity-final-fe.vercel.app",
     credentials: true,
