@@ -28,6 +28,15 @@ router.get(
   }
 );
 
+router.get("/auth/user", (req, res) => {
+  console.log("Auth route hit. Session:", req.session);
+  if (req.isAuthenticated()) {
+    res.json({ user: req.user });
+  } else {
+    res.status(401).json({ user: null });
+  }
+});
+
 router.get(
   "/check",
   authenticate,
@@ -50,15 +59,6 @@ router.get(
     }
   }
 );
-
-router.get("/auth/user", (req, res) => {
-  console.log("Auth route hit. Session:", req.session);
-  if (req.isAuthenticated()) {
-    res.json({ user: req.user });
-  } else {
-    res.status(401).json({ user: null });
-  }
-});
 
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
