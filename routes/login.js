@@ -22,7 +22,7 @@ router.get(
     console.log("Cookies:", req.cookies); // if using cookie-parser
     console.log("User:", req.user); // should also be available
     req.session.save(() => {
-      res.redirect("https://parsity-final-fe.vercel.app/oauth-success");
+      res.redirect("https://parsity-final-fe.vercel.app/post-login");
     });
   }
 );
