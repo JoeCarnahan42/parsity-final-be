@@ -2,27 +2,75 @@ const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
-const passport = require("passport");
 const JWT_KEY = process.env.SECRET_KEY;
 const environment = process.env.NODE_ENV === "production";
-console.log(environment);
 
 const pool = require("../dataBase/db");
 const authenticate = require("../middleware/authenticate");
 
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.post("/google/exchange", async (req, res) => {
+  const { code, codeVerifier } = req.body;
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: "https://parsity-final-fe.vercel.app/",
-  }),
-  (req, res) => {
-    const { email, first_name } = req.user;
+  const dummyPass = (length = 10) => {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+  const dummyPasswordHash = await bcrypt.hash(dummyPass(), 10);
+
+  if (!code || !codeVerifier) {
+    return res.status(400).json({ message: "Missing code or verifier" });
+  }
+
+  try {
+    const tokenRes = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        code,
+        code_verifier: codeVerifier,
+        redirect_uri: "https://parsity-final-fe.vercel.app/",
+        grant_type: "authorization_code",
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    const { access_token } = tokenRes.data;
+
+    const userInfoRes = await axios.get(
+      `https://www.googleapis.com/oauth2/v3/userinfo`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    const {
+      email,
+      given_name: first_name,
+      family_name: family_name,
+    } = userInfoRes.data;
+
+    let user = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (!user.rows.length) {
+      await pool.query(
+        "INSERT INTO users (email, first_name, last_name, password) VALUES ($1, $2, $3, $4)",
+        [email, first_name, family_name, dummyPasswordHash]
+      );
+      user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    }
 
     const token = jwt.sign({ email, firstName: first_name }, JWT_KEY, {
       expiresIn: "60m",
@@ -32,12 +80,15 @@ router.get(
       httpOnly: true,
       secure: environment,
       sameSite: "None",
-      maxAge: 3600000, // 1 Hour
+      maxAge: 3600000,
     });
 
-    res.redirect("https://parsity-final-fe.vercel.app/");
+    return res.status(200).json({ message: "Login successful" });
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    return res.status(500).json({ message: "Google Auth failed" });
   }
-);
+});
 
 router.get(
   "/check",
