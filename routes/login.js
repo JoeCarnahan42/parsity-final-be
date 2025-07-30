@@ -17,11 +17,13 @@ router.get(
     failureRedirect: "https://parsity-final-fe.vercel.app/failure",
   }),
   (req, res) => {
-    console.log("✅ Auth success, user is:", req.user);
-    console.log("✅ Session object is:", req.session);
-    console.log("✅ Session cookie being sent:", req.session.cookie);
-    req.session.save(() => {
-      res.redirect("https://parsity-final-fe.vercel.app/post-login");
+    req.login(req.user, (err) => {
+      if (err) return next(err);
+
+      console.log("✅ Auth success, user is:", req.user);
+      console.log("✅ Session object is:", req.session);
+
+      res.redirect("https://parsity-final-fe.vercel.app/oauth-success");
     });
   }
 );
