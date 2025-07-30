@@ -14,7 +14,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: true,
-    failureRedirect: "https://parsity-final-fe.vercel.app/failure",
+    failureRedirect: "https://parsity-final-fe.onrender.com/failure",
   }),
   (req, res) => {
     req.login(req.user, (err) => {
@@ -23,7 +23,7 @@ router.get(
       console.log("✅ Auth success, user is:", req.user);
       console.log("✅ Session object is:", req.session);
 
-      res.redirect("https://parsity-final-fe.vercel.app/");
+      res.redirect("https://parsity-final-fe.onrender.com/");
     });
   }
 );
