@@ -14,7 +14,8 @@ const swaggerDoc = YAML.load("./swagger.yaml");
 const app = express();
 app.use(
   cors({
-    origin: "https://parsity-final-fe.vercel.app",
+    origin:
+      "https://parsity-final-7zhfck7lh-joecarnahan42s-projects.vercel.app/",
     credentials: true,
   })
 );
