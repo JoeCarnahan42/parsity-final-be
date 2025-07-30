@@ -1,6 +1,8 @@
-export const authenticate = (req, res, next) => {
+const authenticate = (req, res, next) => {
   if (req.isAuthenticated()) {
-    return next(); // user is logged in, continue
+    return next();
   }
   res.status(401).json({ message: "Unauthorized" });
 };
+
+module.exports = authenticate;
