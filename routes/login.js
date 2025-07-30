@@ -13,7 +13,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "https://parsity-final-fe.vercel.app/",
+    failureRedirect: "https://parsity-final-fe.vercel.app/failure",
   }),
   (req, res) => {
     req.session.save(() => {
