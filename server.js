@@ -14,13 +14,6 @@ const swaggerDoc = YAML.load("./swagger.yaml");
 const app = express();
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
 
 const loginRoutes = require("./routes/login");
 const registerRoutes = require("./routes/register");
@@ -32,6 +25,8 @@ const taskRoutes = require("./routes/tasks");
 const commentRoutes = require("./routes/comments");
 const materialRoutes = require("./routes/material");
 
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: "https://parsity-final-fe.vercel.app",
@@ -39,6 +34,15 @@ app.use(
   })
 );
 
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
+console.log(process.env.SECRET_KEY);
 app.use(
   session({
     secret: process.env.SECRET_KEY,

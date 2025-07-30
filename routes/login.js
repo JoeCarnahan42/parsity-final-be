@@ -17,10 +17,9 @@ router.get(
     failureRedirect: "https://parsity-final-fe.vercel.app/failure",
   }),
   (req, res) => {
-    console.log("✅ Google callback route hit, user:", req.user);
-    console.log("Session:", req.session); // logs the session object
-    console.log("Cookies:", req.cookies); // if using cookie-parser
-    console.log("User:", req.user); // should also be available
+    console.log("✅ Auth success, user is:", req.user);
+    console.log("✅ Session object is:", req.session);
+    console.log("✅ Session cookie being sent:", req.session.cookie);
     req.session.save(() => {
       res.redirect("https://parsity-final-fe.vercel.app/post-login");
     });
