@@ -7,9 +7,10 @@ const { authenticate } = require("passport");
 router.post("/create-event", authenticate, async (req, res) => {
   try {
     const userId = req.session?.passport?.user;
-    const user = await pool.query("SELECT * FROM users WHERE id = $1", [
+    const result = await pool.query("SELECT * FROM users WHERE id = $1", [
       userId,
     ]);
+    const user = result.rows[0];
 
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
@@ -35,7 +36,12 @@ router.post("/create-event", authenticate, async (req, res) => {
         dateTime: new Date(req.body.end).toISOString(),
         timeZone: req.body.timeZone,
       },
+      location: req.body.location,
     };
+
+    console.log("userId", userId);
+    console.log("req.body", req.body);
+    console.log("event", event);
 
     await calendar.events.insert({
       calendarId: "primary",
