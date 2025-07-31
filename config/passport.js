@@ -37,8 +37,6 @@ passport.use(
             ]
           );
         }
-
-        console.log(user.rows[0]);
         return done(null, user.rows[0]);
       } catch (err) {
         return done(err, null);
@@ -49,7 +47,6 @@ passport.use(
 
 // Serialize user ID into session cookie
 passport.serializeUser((user, done) => {
-  console.log("SERIALIZED:", user.id);
   done(null, user.id);
 });
 
@@ -60,7 +57,6 @@ passport.deserializeUser(async (id, done) => {
     if (user.rows.length === 0) {
       return done(null, false);
     }
-    console.log("DESERIALIZED", user.rows[0]);
     done(null, user.rows[0]);
   } catch (err) {
     done(err, null);
