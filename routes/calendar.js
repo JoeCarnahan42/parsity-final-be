@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { google } = require("googleapis");
 const pool = require("../dataBase/db");
+const { authenticate } = require("passport");
 
-router.post("/create-event", async (req, res) => {
+router.post("/create-event", authenticate, async (req, res) => {
   try {
     const userId = req.session?.passport?.user;
     const user = await pool.query("SELECT * FROM users WHERE id = $1", [
@@ -24,9 +25,16 @@ router.post("/create-event", async (req, res) => {
     const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
     const event = {
-      summary: "Test Meeting",
-      start: { dateTime: "2025-08-01T10:00:00-05:00" },
-      end: { dateTime: "2025-08-01T11:00:00-05:00" },
+      summary: req.body.summary,
+      description: req.body.description,
+      start: {
+        dateTime: new Date(req.body.start).toISOString(),
+        timeZone: req.body.timeZone,
+      },
+      end: {
+        dateTime: new Date(req.body.end).toISOString(),
+        timeZone: req.body.timeZone,
+      },
     };
 
     await calendar.events.insert({
