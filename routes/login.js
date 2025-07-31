@@ -8,8 +8,13 @@ const authenticate = require("../middleware/authenticate");
 router.get(
   "/google",
   passport.authenticate("google", {
-    scope: ["profile", "email"],
-    prompt: "select_account",
+    scope: [
+      "profile",
+      "email",
+      "https://www.googleapis.com/auth/calendar.events",
+    ],
+    accessType: "offline",
+    prompt: "consent select_account",
   })
 );
 

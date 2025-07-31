@@ -26,8 +26,15 @@ passport.use(
 
         if (user.rows.length === 0) {
           user = await pool.query(
-            "INSERT INTO users (email, first_name, last_name, password) VALUES ($1, $2, $3, $4) RETURNING *",
-            [email, firstName, lastName, dummyPasswordHash]
+            "INSERT INTO users (email, first_name, last_name, password, access_token, refresh_token) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            [
+              email,
+              firstName,
+              lastName,
+              dummyPasswordHash,
+              accessToken,
+              refreshToken,
+            ]
           );
         }
 

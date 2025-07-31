@@ -24,6 +24,7 @@ const purchaseRoutes = require("./routes/purchase");
 const taskRoutes = require("./routes/tasks");
 const commentRoutes = require("./routes/comments");
 const materialRoutes = require("./routes/material");
+const calendarRoutes = require("./routes/calendar");
 
 app.set("trust proxy", 1);
 
@@ -71,6 +72,7 @@ app.use("/purchases", purchaseRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/materials", materialRoutes);
 app.use("/comments", commentRoutes);
+app.use("/calendar", calendarRoutes);
 
 const PORT = process.env.PORT || 8000;
 
