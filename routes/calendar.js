@@ -39,10 +39,6 @@ router.post("/create-event", authenticate, async (req, res) => {
       location: req.body.location,
     };
 
-    console.log("userId", userId);
-    console.log("req.body", req.body);
-    console.log("event", event);
-
     await calendar.events.insert({
       calendarId: "primary",
       resource: event,
