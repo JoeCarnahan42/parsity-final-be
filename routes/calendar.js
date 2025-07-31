@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { google } = require("googleapis");
 const pool = require("../dataBase/db");
-import authenticate from "../middleware/authenticate";
+const authenticate = require("../middleware/authenticate");
 
 router.post("/create-event", authenticate, async (req, res) => {
   try {
